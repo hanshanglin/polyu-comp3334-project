@@ -104,6 +104,26 @@ class User(UserMixin):
             except ValueError:
                 pass
         return unicode(uuid.uuid4())
+    
+    def get_dynamic_passcode_client_android(self):
+        """generate an OTP apk for user, returns: file name to the apk
+         Note: will always generate an apk on each call
+         Note: requires -nix and java environment
+        """
+        if self.seed is None:
+            return None
+        #can use designated_name="xx" to specify file name
+        return OTPPreset.get_OTP_client_android(self.seed)
+    
+    def get_dynamic_passcode_client_windows(self):
+        """generate an OTP .py for user, returns: file name to the .py
+         Note: will always generate an apk on each call
+         Note: requires python environment
+        """
+        if self.seed is None:
+            return None
+        #can use designated_name="xx" to specify file name
+        return OTPPreset.get_OTP_client_win(self.seed)
 
     @staticmethod
     def get(user_id):
