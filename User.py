@@ -5,6 +5,7 @@ import json
 import uuid
 from flask_login._compat import unicode
 import time
+from otp import OTPPreset
 PROFILES = "profiles.json"
 
 
@@ -36,8 +37,7 @@ class User(UserMixin):
         
         :return seed: the random dynamic seed
         """
-        # TODO complete seed generation
-        seed = 123456
+        seed = OTPPreset.generate_seed()
         return seed
 
     def verify_password(self, password, dynamic):
@@ -49,8 +49,7 @@ class User(UserMixin):
         # (unixtime%1000 /30)^2 *seed_token %1000000
         if self.seed is None:
             return False
-        # TODO: complete the dynamic check algorithm
-        return True
+        return OTPPreset.check(self.seed, dynamic)
 
     def get_dynamic_seed(self):
         """try to get dynamic seed from file.
@@ -105,6 +104,26 @@ class User(UserMixin):
             except ValueError:
                 pass
         return unicode(uuid.uuid4())
+    
+    def get_dynamic_passcode_client_android(self):
+        """generate an OTP apk for user, returns: file name to the apk
+         Note: will always generate an apk on each call
+         Note: requires -nix and java environment
+        """
+        if self.seed is None:
+            return None
+        #can use designated_name="xx" to specify file name
+        return OTPPreset.get_OTP_client_android(self.seed)
+    
+    def get_dynamic_passcode_client_windows(self):
+        """generate an OTP .py for user, returns: file name to the .py
+         Note: will always generate an apk on each call
+         Note: requires python environment
+        """
+        if self.seed is None:
+            return None
+        #can use designated_name="xx" to specify file name
+        return OTPPreset.get_OTP_client_win(self.seed)
 
     @staticmethod
     def get(user_id):
