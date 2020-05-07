@@ -5,6 +5,7 @@ import json
 import uuid
 from flask_login._compat import unicode
 import time
+from otp import OTPPreset
 PROFILES = "profiles.json"
 
 
@@ -36,8 +37,7 @@ class User(UserMixin):
         
         :return seed: the random dynamic seed
         """
-        # TODO complete seed generation
-        seed = 123456
+        seed = OTPPreset.generate_seed()
         return seed
 
     def verify_password(self, password, dynamic):
@@ -49,8 +49,7 @@ class User(UserMixin):
         # (unixtime%1000 /30)^2 *seed_token %1000000
         if self.seed is None:
             return False
-        # TODO: complete the dynamic check algorithm
-        return True
+        return OTPPreset.check(self.seed, dynamic)
 
     def get_dynamic_seed(self):
         """try to get dynamic seed from file.
