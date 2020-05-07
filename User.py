@@ -4,7 +4,7 @@ from flask_login import UserMixin
 import json
 import uuid
 from flask_login._compat import unicode
-
+import time
 PROFILES = "profiles.json"
 
 
@@ -13,28 +13,63 @@ class User(UserMixin):
         self.username = username
         self.password_hash = self.get_password_hash()
         self.id = self.get_id()
+        self.seed = self.get_dynamic_seed()
 
-    # @property
-    # def password(self):
-    #     raise AttributeError('password is not readable')
-# 
-    # @password.setter
-    def password(self, password):
-        """save user name, id and password hash to json file"""
+    def register_user(self, password):
+        """save user name, id and password hash to json file
+        
+        :return dynamic seed
+        """
         # sha256 with 16 bits salt 
         self.password_hash = generate_password_hash(password,salt_length=16)
+        self.seed = self.dynamic_seed()
         with open(PROFILES, 'w+') as f:
             try:
                 profiles = json.load(f)
             except ValueError:
                 profiles = {}
-            profiles[self.username] = [self.password_hash,self.id]
+            profiles[self.username] = [self.password_hash,self.id,dynamic_seed]
             f.write(json.dumps(profiles))
 
-    def verify_password(self, password):
-        if self.password_hash is None:
+    def dynamic_seed(self):
+        """save dynamic seed to json file
+        
+        :return seed: the random dynamic seed
+        """
+        # TODO complete seed generation
+        seed = 123456
+        return seed
+
+    def verify_password(self, password, dynamic):
+        if self.password_hash or self.seed is None:
             return False
-        return check_password_hash(self.password_hash, password)
+        return check_password_hash(self.password_hash, password) and check_dynamic(dynamic)
+
+    def check_dynamic(self,dynamic):
+        # (unixtime%1000 /30)^2 *seed_token %1000000
+        if self.seed is None:
+            return False
+        # TODO: complete the dynamic check algorithm
+        return True
+
+    def get_dynamic_seed(self):
+        """try to get dynamic seed from file.
+
+        :return seed: if the there is corresponding user in
+                the file, return seed.
+                None: if there is no corresponding user, return None.
+        """
+        try:
+            with open(PROFILES) as f:
+                user_profiles = json.load(f)
+                user_info = user_profiles.get(self.username, None)
+                if user_info is not None:
+                    return user_info[2]
+        except IOError:
+            return None
+        except ValueError:
+            return None
+        return None
 
     def get_password_hash(self):
         """try to get password hash from file.
