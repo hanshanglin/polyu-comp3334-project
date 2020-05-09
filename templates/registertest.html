@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <div class="container">
+        <form>
+            username: <input id="username" name="username" type="text" placeholder="username" value="">
+            password: <input id="password" name="password" type="password" value="">
+            repassword: <input id="repassword" name="repassword" type="password" value="">
+        </form>
+        <button id="regist">regist</button>
+    </div>
+
+    {%  block js %}
+    <script src="http://code.jquery.com/jquery-1.8.3.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $("#regist").click(function () {
+                var username = $("#username").val();
+                var password = $("#password").val();
+                var repassword = $("#repassword").val();
+                var mydata = { 'username': username, 'password': password, 'repassword': repassword };
+                $.post(
+                    "/regist",
+                    mydata,
+                    function (data, status) {
+                        alert("status: " + data.status + "msg: " + data.msg);
+                        if (data.status == "fail") {
+                            location.reload();
+                        } else {
+                            window.location.href = "/";
+                        }
+                    });
+            });
+        });
+    </script>
+    {%  endblock %}
+</body>
+
+</html>
