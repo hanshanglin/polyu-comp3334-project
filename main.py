@@ -7,6 +7,7 @@ from flask_login import logout_user
 import os
 from Form import LoginForm,RegisterForm
 import json
+from keychain import KeyChainStorage
 
 app = Flask(__name__)
 
@@ -48,6 +49,52 @@ def login():
 def test_target():
     return "you are in"
 
+
+@app.route('/getKeyChain',methods=['POST','GET'])
+@login_required
+def request_key_chain():
+    user = current_user._get_current_object()
+    l = KeyChainStorage.get_keychain_item_list(user.keychain)
+    res = {'status':"OK"}
+    li = []
+    for uuid,weburl,username,password,comment in l:
+        tmp = {
+            'uuid':uuid,
+            'weburl':weburl,
+            'username':username,
+            'password':password,
+            'comment':comment
+        }
+        li.append(tmp)
+    res['data'] = li
+    return jsonify(res)
+
+@app.route('/updateKeyChain',methods=['POST','GET'])
+@login_required
+def update_key_chain():
+    user = current_user._get_current_object()
+    des = user.keychain
+    l = request.form['data']
+    if l==None:
+        return jsonify({'status':'ERR', 'msg':"No data found"})
+
+    res = {'status':"OK"}
+    cnt = 0
+    for i in l:
+        if 'uuid' not in i.keys():
+            # add
+            KeyChainStorage.add_keychain_item(des,i['weburl'],i['username'],i['password'],i['comment'])
+            cnt+=1
+        elif 'username' not in i.keys():
+            # del
+            KeyChainStorage.delete_keychain_item(des,i['uuid'])
+            cnt+=1
+        else:
+            # update
+            KeyChainStorage.update_keychain_item(des,i['uuid'],i['weburl'],i['username'],i['password'],i['comment'])
+            cnt+=1
+    res['finish']=cnt
+    return jsonify(res)
 
 @app.route('/register',methods=['POST','GET'])
 def register():
