@@ -1,6 +1,7 @@
 <!doctype html>
 
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
   <title>Register</title>
@@ -9,12 +10,45 @@
 
 <body>
   <h1>Register</h1>
-  <form class="form" method="POST">
-    {{ form.csrf_token }}
-    {{ form.username.label }}{{ form.username() }}
-    {{ form.password.label }}{{ form.password() }}
-    {{ form.submit() }}
-</form>
+
+  <div class="container">
+    <form>
+      username: <input id="username" name="username" type="text" placeholder="username" value="">
+      password: <input id="password" name="password" type="password" value="">
+      repassword: <input id="repassword" name="repassword" type="password" value="">
+      {{ form.csrf_token }}
+    </form>
+    <button id="regist">regist</button>
+  </div>
+
+
+  {%  block js %}
+  <script src="http://code.jquery.com/jquery-1.8.3.min.js"></script>
+  <script>
+    $(document).ready(function () {
+      $("#regist").click(function () {
+        var username = $("#username").val();
+        var password = $("#password").val();
+        var repassword = $("#repassword").val();
+        var csrf = $("#csrf_token").val();
+        var mydata = { 'username': username, 'password': password, 'repassword': repassword, 'csrf_token': csrf };
+        $.post(
+          "/register",
+          mydata,
+          function (data, status) {
+            alert("status: " + data.status + "    msg: " + data.msg);
+            if (data.status == "fail") {
+              location.reload();
+            } else {
+              window.location.href = "/login";
+            }
+          });
+      });
+    });
+  </script>
+  {%  endblock %}
+  </form>
 
 </body>
+
 </html>

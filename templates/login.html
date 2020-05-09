@@ -9,13 +9,44 @@
 
 <body>
   <h1>login</h1>
-  <form class="form" method="POST">
-    {{ form.csrf_token }}
-    {{ form.username.label }}{{ form.username() }}
-    {{ form.password.label }}{{ form.password() }}
-    {{ form.dynamic.label }}{{ form.dynamic() }}
-    {{ form.submit() }}
-</form>
+  <div class="container">
+    <form>
+        username: <input id="username" name="username" type="text" placeholder="username" value="">
+        password: <input id="password" name="password" type="password" value="">
+        dynamic token: <input id="dynamic" name="password" type="password" value="">
+        {{ form.csrf_token }}
+    </form>
+    <p>do not have an account? <a href="/register">create</a></p>
+    <button id="login">login</button>
+</div>
+{%  block js %}
+<script src="http://code.jquery.com/jquery-1.8.3.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $("#login").click(function () {
+            var username = $("#username").val();
+            var password = $("#password").val();
+            var dynamic = $("#dynamic").val();
+            var csrf = $("#csrf_token").val();
+            var mydata = { 'username': username, 
+                          'password': password,
+                          'csrf_token':csrf,
+                          'dynamic':dynamic };
+            $.post(
+                "/login",
+                mydata,
+                function (data, status) {
+                    alert("status: " + data.status);
+                    if (data.status == "fail") {
+                        location.reload();
+                    } else {
+                        window.location.href = "/test";
+                    }
+                });
+        });
+    });
+</script>
+{%  endblock %}
 
 </body>
 </html>
