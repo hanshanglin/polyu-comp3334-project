@@ -6,6 +6,7 @@ import uuid
 from flask_login._compat import unicode
 import time
 from otp import OTPPreset
+from keychain import KeyChainStorage
 PROFILES = "profiles.json"
 
 
@@ -15,6 +16,7 @@ class User(UserMixin):
         self.password_hash = self.get_password_hash()
         self.id = self.get_id()
         self.seed = self.get_dynamic_seed()
+        self.keychain = self.get_keychain()
 
     def register_user(self, password):
         """save user name, id and password hash to json file
@@ -24,12 +26,13 @@ class User(UserMixin):
         # sha256 with 16 bits salt 
         self.password_hash = generate_password_hash(password,salt_length=16)
         self.seed = self.dynamic_seed()
+        self.keychain = self.keychain()
         with open(PROFILES, 'w+') as f:
             try:
                 profiles = json.load(f)
             except ValueError:
                 profiles = {}
-            profiles[self.username] = [self.password_hash,self.id,dynamic_seed]
+            profiles[self.username] = [self.password_hash,self.id,self.seed,self.keychain]
             f.write(json.dumps(profiles))
 
     def dynamic_seed(self):
@@ -39,6 +42,12 @@ class User(UserMixin):
         """
         seed = OTPPreset.generate_seed()
         return seed
+    
+    def keychain(self):
+        """generate keychain file name
+        :return keychain: keychain file name, excluding KeyChainStorage's working directory
+        """
+        return KeyChainStorage.create_new_keychain()
 
     def verify_password(self, password, dynamic):
         if self.password_hash or self.seed is None:
@@ -64,6 +73,25 @@ class User(UserMixin):
                 user_info = user_profiles.get(self.username, None)
                 if user_info is not None:
                     return user_info[2]
+        except IOError:
+            return None
+        except ValueError:
+            return None
+        return None
+    
+    def get_keychain(self):
+        """try to get keychain file name from file.
+
+        :return keychain: if the there is corresponding user in
+                the file, return keychain file name.
+                None: if there is no corresponding user, return None.
+        """
+        try:
+            with open(PROFILES) as f:
+                user_profiles = json.load(f)
+                user_info = user_profiles.get(self.username, None)
+                if user_info is not None:
+                    return user_info[3]
         except IOError:
             return None
         except ValueError:
@@ -124,6 +152,14 @@ class User(UserMixin):
             return None
         #can use designated_name="xx" to specify file name
         return OTPPreset.get_OTP_client_win(self.seed)
+    
+    def get_keychain_items(self):
+        """get a list of items from user's keychain storage
+        every item in the list is a tuple(uuid, weburl, username, password, comments)
+        """
+        if self.keychain is None:
+            return None
+        return KeyChainStorage.get_keychain_item_list(self.keychain)
 
     @staticmethod
     def get(user_id):
