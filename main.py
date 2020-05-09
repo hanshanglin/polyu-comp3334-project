@@ -1,4 +1,4 @@
-from flask import Flask,url_for,render_template,request,redirect
+from flask import Flask,url_for,render_template,request,redirect,jsonify
 from flask_wtf.csrf import CsrfProtect
 from User import User
 from flask_login import login_user, login_required
@@ -6,6 +6,7 @@ from flask_login import LoginManager, current_user
 from flask_login import logout_user
 import os
 from Form import LoginForm,RegisterForm
+import json
 
 app = Flask(__name__)
 
@@ -32,16 +33,21 @@ def login():
     if form.validate_on_submit():
         user_name = request.form.get('username', None)
         password = request.form.get('password', None)
+        dynamic = request.form.get('dynamic',None)
         user = User(user_name)
-        if user.verify_password(password):
+        if user.verify_password(password,dynamic):
             login_user(user)
-            return redirect(url_for('test_target'))
+            return jsonify({'status':'OK','msg':'login successfully'})
+        else:
+            return jsonify({'status':'ERR','msg':'password, password and OPT are not match'})
     return render_template('login.html',form = form)
+
 
 @app.route("/test")
 @login_required
 def test_target():
     return "you are in"
+
 
 @app.route('/register',methods=['POST','GET'])
 def register():
@@ -50,10 +56,14 @@ def register():
         user_name = request.form.get('username', None)
         password = request.form.get('password', None)
         user = User(user_name)
-        user.password(password)
-        return redirect(url_for('login'))
-    return render_template('register.html',form = form)
+        # if the register successfully, all info will save in profiles.json
+        try:
+            user.register_user(password)
+        except Exception as e:
+            return jsonify({'status':'ERR','msg':str(e)})
 
+        return jsonify({'status':'OK','msg':'register successfully'})
+    return render_template('register.html',form = form)
 
 
 @app.route('/logout')
@@ -61,6 +71,7 @@ def register():
 def logout():
     logout_user()
     return redirect(url_for('login'))
+
 
 if __name__ == '__main__':
     app.run(debug=True)
