@@ -24,12 +24,15 @@ class User(UserMixin):
         # sha256 with 16 bits salt 
         self.password_hash = generate_password_hash(password,salt_length=16)
         self.seed = self.dynamic_seed()
-        with open(PROFILES, 'w+') as f:
+        with open(PROFILES) as f:
             try:
                 profiles = json.load(f)
             except ValueError:
                 profiles = {}
-            profiles[self.username] = [self.password_hash,self.id,dynamic_seed]
+        if self.username in profiles.keys():
+            raise Exception("username has been registered")
+        with open(PROFILES,'w') as f:
+            profiles[self.username] = [self.password_hash,self.id,self.seed]
             f.write(json.dumps(profiles))
 
     def dynamic_seed(self):
@@ -41,9 +44,9 @@ class User(UserMixin):
         return seed
 
     def verify_password(self, password, dynamic):
-        if self.password_hash or self.seed is None:
+        if self.password_hash is None or self.seed is None:
             return False
-        return check_password_hash(self.password_hash, password) and check_dynamic(dynamic)
+        return check_password_hash(self.password_hash, password) and self.check_dynamic(dynamic)
 
     def check_dynamic(self,dynamic):
         # (unixtime%1000 /30)^2 *seed_token %1000000
