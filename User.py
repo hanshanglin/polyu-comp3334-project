@@ -26,7 +26,7 @@ class User(UserMixin):
         # sha256 with 16 bits salt 
         self.password_hash = generate_password_hash(password,salt_length=16)
         self.seed = self.dynamic_seed()
-        self.keychain = self.keychain()
+        self.keychain = KeyChainStorage.create_new_keychain()
         with open(PROFILES) as f:
             try:
                 profiles = json.load(f)
@@ -45,12 +45,6 @@ class User(UserMixin):
         """
         seed = OTPPreset.generate_seed()
         return seed
-    
-    def keychain(self):
-        """generate keychain file name
-        :return keychain: keychain file name, excluding KeyChainStorage's working directory
-        """
-        return KeyChainStorage.create_new_keychain()
 
     def verify_password(self, password, dynamic):
         if self.password_hash is None or self.seed is None:
