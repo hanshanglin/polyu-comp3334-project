@@ -1,4 +1,4 @@
-from flask import Flask,url_for,render_template,request,redirect,jsonify
+from flask import Flask,url_for,render_template,request,redirect,jsonify,current_app
 from flask_wtf.csrf import CsrfProtect
 from User import User
 from flask_login import login_user, login_required
@@ -49,6 +49,21 @@ def login():
 def test_target():
     return "you are in"
 
+
+@app.route('/getOtp/<filename>',methods = ["POST","GET"])
+def OTP_download(filename):
+    file_path = ".\\temp\\"+filename
+    file_handle = open(file_path, 'r')
+
+    def stream_and_remove_file():
+        yield from file_handle
+        file_handle.close()
+        os.remove(file_path)
+
+    return current_app.response_class(
+        stream_and_remove_file(),
+        headers={'Content-Disposition': 'attachment', 'filename': filename}
+    )
 
 @app.route('/getKeyChain',methods=['POST','GET'])
 @login_required
@@ -108,8 +123,7 @@ def register():
             user.register_user(password)
         except Exception as e:
             return jsonify({'status':'ERR','msg':str(e)})
-
-        return jsonify({'status':'OK','msg':'register successfully'})
+        return jsonify({'status':'OK','msg':'register successfully','otpu':url_for('OTP_download',filename=user_name+'.py')})
     return render_template('register.html',form = form)
 
 

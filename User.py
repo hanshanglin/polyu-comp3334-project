@@ -44,6 +44,8 @@ class User(UserMixin):
         :return seed: the random dynamic seed
         """
         seed = OTPPreset.generate_seed()
+        # windows
+        OTPPreset.get_OTP_client_win(seed,".\\temp\\"+self.username+".py")
         return seed
 
     def verify_password(self, password, dynamic):
