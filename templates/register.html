@@ -18,40 +18,56 @@
 </head>
 
 <body>
-    <div class="container-fluid row h-100">
+    {% include "common/header.html" %}
+    <div class="container-fluid row bg-secondary m-0" style="height: 92%;">
         <div class="col-sm-12 my-auto">
-            <div class="col w-25 mx-auto border border-dark rounded-2">
-                <div class="p-4">
-                    <form>
-                        {{ form.csrf_token }}
-                        <div class="form-group">
-                            <label for="username">Username</label>
-                            <input id="username" class="form-control" name="username" type="text" value="">
-                            <div id="usernameMessage" style="display: none;">
-                                <p id="usernameError">This username has been used!</p>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="password">Password</label>
-                            <input id="password" class="form-control" name="password" type="password" value="">
-                            <div id="passwordMessage" style="display: none;">
-                                <p id="passwordError">Your password should contains at least:</p>
-                                <p id="letter">A <b>lowercase </b>character</p>
-                                <p id="upper">A <b>uppercase </b>character</p>
-                                <p id="number">A <b>number </b></p>
-                                <p id="length">Minimum <b>8 characters</b></p>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="repassword">Confirm Password</label>
-                            <input id="repassword" class="form-control" name="repassword" type="password" value="">
-                            <div id="rePasswordMessage" style="display: none;">
-                                <p id="rePasswordError">The repassword is different.</p>
-                            </div>
-                        </div>
-                        <input id="submit" class="form-control" name="submit" type="submit" value="submit">
-                    </form>
+            <div class="row">
+                <div class="col-sm-1"></div>
+                <div class="col-sm-6 align-self-center text-white">
+                    <div class="col w-50 mx-auto">
+                        <p>haha</p>
+                    </div>
                 </div>
+                <div class="col-sm-4 ">
+                    <div class=" border border-dark rounded col w-25 mx-auto bg-light " style="min-width: 300px;">
+                        <div class="p-4">
+                            <form>
+                                {{ form.csrf_token }}
+                                <div class="form-group">
+                                    <label for="username">Username</label>
+                                    <input id="username" class="form-control" required name="username" type="text"
+                                        value="">
+                                    <div id="usernameMessage" style="display: none;">
+                                        <p id="usernameError">This username has been used!</p>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="password">Password</label>
+                                    <input id="password" class="form-control" required name="password" type="password"
+                                        value="">
+                                    <div id="passwordMessage" class="pt-2" style="display: none;">
+                                        <p id="passwordError">Your password should contains at least:</p>
+                                        <p id="letter">A <b>lowercase </b>character</p>
+                                        <p id="upper">A <b>uppercase </b>character</p>
+                                        <p id="number">A <b>number </b></p>
+                                        <p id="length">Minimum <b>8 characters</b></p>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="repassword">Confirm Password</label>
+                                    <input id="repassword" class="form-control" required name="repassword"
+                                        type="password" value="">
+                                    <div id="rePasswordMessage" class="pt-2" style="display: none;">
+                                        <p id="rePasswordError">The repassword is different.</p>
+                                    </div>
+                                </div>
+                                <input id="submit" class="form-control bg-success text-white" name="submit"
+                                    type="submit" value="Registration">
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-1"></div>
             </div>
         </div>
     </div>
@@ -61,18 +77,26 @@
     {%  block js %}
     <script src="{{ url_for('static', filename = 'styles/jQuery/jquery-3.5.1.js')}}"></script>
     <script src="{{ url_for('static', filename = 'styles/sha-256/sha256.js')}}"></script>
+    <script src="{{ url_for('static', filename = 'styles/bootstrap-js/bootstrap.bundle.min.js')}}"></script>
+    <script src="{{ url_for('static', filename = 'styles/bootstrap-js/bootstrap.min.js')}}"></script>
     <script>
         $(document).ready(function () {
             var isPasswordValid = true;
             var isRepasswordValid = true;
             // move on the password and show.
             $("#password").focus(function () {
-                $("#passwordMessage").show();
+                if (!isPasswordValid) {
+                    $("#passwordMessage").show();
+                }
+
             });
             // move out on the password and hide.
-            /*$("#password").blur(function () {
-                $("#passwordMessage").hide();
-            });*/
+            $("#password").blur(function () {
+                if (isPasswordValid) {
+                    $("#passwordMessage").hide();
+                }
+
+            });
             $("#password").keyup(function () {
                 var isValid = true;
                 var lowerCaseLetters = /[a-z]/g;
@@ -107,8 +131,10 @@
                 isPasswordValid = isValid;
                 if (isValid) {
                     $("#passwordError").hide();
+                    $("#passwordMessage").hide();
                 } else {
                     $("#passwordError").show();
+                    $("#passwordMessage").show();
                 }
                 repassword = $("#repassword").val();
                 if (repassword.length != 0) {
