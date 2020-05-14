@@ -8,49 +8,63 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/bootstrap-css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/bootstrap-css/bootstrap-grid.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/bootstrap-css/bootstrap-reboot.min.css') }}">
+    <style>
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+        }
+    </style>
 </head>
 
 <body>
-    <div class="container">
-        <form>
-            {{ form.csrf_token }}
-            <div class="form-group">
-                <label for="username">Username</label>
-                <input id="username" class="form-control" name="username" type="text" value="">
-                <div id="usernameMessage" style="display: none;">
-                    <p id="usernameError">This username has been used!</p>
+    <div class="container-fluid row h-100">
+        <div class="col-sm-12 my-auto">
+            <div class="col w-25 mx-auto border border-dark rounded-2">
+                <div class="p-4">
+                    <form>
+                        {{ form.csrf_token }}
+                        <div class="form-group">
+                            <label for="username">Username</label>
+                            <input id="username" class="form-control" name="username" type="text" value="">
+                            <div id="usernameMessage" style="display: none;">
+                                <p id="usernameError">This username has been used!</p>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Password</label>
+                            <input id="password" class="form-control" name="password" type="password" value="">
+                            <div id="passwordMessage" style="display: none;">
+                                <p id="passwordError">Your password should contains at least:</p>
+                                <p id="letter">A <b>lowercase </b>character</p>
+                                <p id="upper">A <b>uppercase </b>character</p>
+                                <p id="number">A <b>number </b></p>
+                                <p id="length">Minimum <b>8 characters</b></p>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="repassword">Confirm Password</label>
+                            <input id="repassword" class="form-control" name="repassword" type="password" value="">
+                            <div id="rePasswordMessage" style="display: none;">
+                                <p id="rePasswordError">The repassword is different.</p>
+                            </div>
+                        </div>
+                        <input id="submit" class="form-control" name="submit" type="submit" value="submit">
+                    </form>
                 </div>
             </div>
-            <div class="form-group">
-                <label for="password">Password</label>
-                <input id="password" class="form-control" name="password" type="password" value="">
-                <div id="passwordMessage" style="display: none;">
-                    <p id="passwordError">Your password should contains at least:</p>
-                    <p id="letter">A <b>lowercase </b>character</p>
-                    <p id="upper">A <b>uppercase </b>character</p>
-                    <p id="number">A <b>number </b></p>
-                    <p id="length">Minimum <b>8 characters</b></p>
-                </div>
-            </div>
-            <div class="form-group">
-                <label for="repassword">Confirm Password</label>
-                <input id="repassword" class="form-control" name="repassword" type="password" value="">
-                <div id="rePasswordMessage" style="display: none;">
-                    <p id="rePasswordError">The repassword is different.</p>
-                </div>
-            </div>
-            <input id="submit" name="submit" type="submit" value="submit">
-        </form>
-
+        </div>
     </div>
+
+
 
     {%  block js %}
     <script src="{{ url_for('static', filename = 'styles/jQuery/jquery-3.5.1.js')}}"></script>
     <script src="{{ url_for('static', filename = 'styles/sha-256/sha256.js')}}"></script>
     <script>
         $(document).ready(function () {
-
-            //var isValid = true;
+            var isPasswordValid = true;
+            var isRepasswordValid = true;
             // move on the password and show.
             $("#password").focus(function () {
                 $("#passwordMessage").show();
@@ -90,22 +104,36 @@
                 } else {
                     $("#length").hide();
                 }
+                isPasswordValid = isValid;
                 if (isValid) {
                     $("#passwordError").hide();
                 } else {
                     $("#passwordError").show();
                 }
+                repassword = $("#repassword").val();
+                if (repassword.length != 0) {
+                    if (repassword.match(password)) {
+                        isRepasswordValid = true;
+                        $("#rePasswordMessage").hide();
+                    } else {
+                        isRepasswordValid = false;
+                        $("#rePasswordMessage").show();
+                    }
+                }
+
             });
 
-            var isRepasswordValid = true;
+
             $("#repassword").keyup(function () {
                 var password = $("#password").val();
                 var repassword = $("#repassword").val();
                 if (password.match(repassword)) {
+                    isRepasswordValid = true;
                     $("#rePasswordMessage").hide();
                 }
                 else {
                     console.log("do not match")
+                    isRepasswordValid = false;
                     $("#rePasswordMessage").show();
                 }
             })
@@ -114,12 +142,21 @@
                 var password = $("#password").val();
                 var repassword = $("#repassword").val();
                 if (repassword.length != password.length) {
+                    isRepasswordValid = false;
                     $("#rePasswordMessage").show();
                 }
             })
 
             $("#submit").click(function () {
                 event.preventDefault();
+                if (!isPasswordValid) {
+                    alert("Password is not valid");
+                    return;
+                }
+                if (!isRepasswordValid) {
+                    alert("Password is not confirmed")
+                    return;
+                }
                 var username = $("#username").val();
                 var password = $("#password").val();
                 var csrf_token = $('#csrf_token').val();
@@ -129,12 +166,11 @@
                     "/register",
                     mydata,
                     function (data, status) {
-                        alert("status: " + data.status + "msg: " + data.msg);
+                        alert(data.msg);
                         if (data.status == "ERR") {
-                            alert(data.msg)
                             location.reload();
                         } else {
-                            window.location.href = "/";
+                            window.location.href = "/login";
                         }
                     });
             });
