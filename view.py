@@ -13,29 +13,47 @@ def view():
 
 @app.route('/mytable')
 def mytable():
-    table = [('Website', 'Username', 'Password', 'Note'),
-             ('1', '2', '3', '4')]
+    table = [('ID', 'Website', 'Username', 'Password', 'Note'),
+             ('xxxxx', '1', '2', '3', '4')]
 
-    print('mytable')
     data = json.dumps(table)
     print(data)
     return data
 
 
-@app.route('/myform', methods=['POST'])
+@app.route('/add', methods=['POST'])
 def myform():
-    print('post')
     a = request.form['Website']
     b = request.form['Username']
     c = request.form['Password']
     d = request.form['Note']
 
     data = {'website': a,
-            'Username': b,
-            'Password': c,
-            'Note': d}
+            'username': b,
+            'password': c,
+            'note': d}
     return jsonify(data)
 
+
+@app.route('/delete', methods=['POST'])
+def delete():
+    uuid = request.form['Id']
+    return jsonify({'uuid': uuid})
+
+@app.route('/modify', methods=['POST'])
+def modify():
+    a = request.form['MWebsite']
+    b = request.form['MUsername']
+    c = request.form['MPassword']
+    d = request.form['MNote']
+    uuid = request.form['MId']
+
+    data = {'uuid': uuid,
+            'website':a,
+            'username': b,
+            'password': c,
+            'note': d}
+    return jsonify(data)
 
 if __name__ == '__main__':
     app.run()

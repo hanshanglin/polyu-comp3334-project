@@ -10,13 +10,6 @@
   <body>
 	<h1>Welcome</h1>
 	<hr>
-	<form action="/myform" method='post'>
-	First name: <input type="text" name="Website" id="website"><br>
-	Last name: <input type="text" name="Username" id="username"><br>
-	Password: <input type="text" name='Password' id='password'><br>
-	Note: <input type="text" name='Note' id='note'><br>
-	<input type="submit" value="Add to Database">
-	</form>
 	<div id="createtable">
 		{%  block js %}
 		<script>
@@ -51,6 +44,33 @@
         });
 		</script>
 		{%  endblock %}
-	</div>
+	</div><br>
+	<h2>Add</h2>
+	<form action="/add" method='post'>
+	Website: <input type="text" name="Website" id="website">
+	Username: <input type="text" name="Username" id="username"><br>
+	Password: <input type="text" name='Password' id='password'>
+	Note: <input type="text" name='Note' id='note'><br>
+	<input type="submit" value="Add to Database">
+	</form>
+	
+	<h2>Delete</h2>
+	<form action="/delete" method='post'>
+	Enter the ID of the line you want to delete.<br>
+	ID: <input type="text" name="Id" id="id"><br>
+	<input type="submit" value="Delete">
+	</form>
+	
+	<h2>Modify</h2>
+	<form action="/modify" method='post'>
+	
+	ID: <input type="text" name="MId" id="mid"><br>
+	Website: <input type="text" name="MWebsite" id="mwebsite">
+	Username: <input type="text" name="MUsername" id="musername"><br>
+	Password: <input type="text" name='MPassword' id='mpassword'>
+	Note: <input type="text" name='MNote' id='mnote'><br>
+	<input type="submit" value="Modify">
+	</form>
+	
   </body>
 </html>
