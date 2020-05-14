@@ -1,52 +1,70 @@
-<!doctype html>
-
+<!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="utf-8">
-  <title>login</title>
 
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/bootstrap-css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/bootstrap-css/bootstrap-grid.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/bootstrap-css/bootstrap-reboot.min.css') }}">
 </head>
 
 <body>
-  <h1>login</h1>
-  <div class="container">
-    <form>
-        username: <input id="username" name="username" type="text" placeholder="username" value="">
-        password: <input id="password" name="password" type="password" value="">
-        dynamic token: <input id="dynamic" name="password" type="password" value="">
-        {{ form.csrf_token }}
-    </form>
-    <p>do not have an account? <a href="/register">create</a></p>
-    <button id="login">login</button>
-</div>
-{%  block js %}
-<script src="http://code.jquery.com/jquery-1.8.3.min.js"></script>
-<script>
-    $(document).ready(function () {
-        $("#login").click(function () {
-            var username = $("#username").val();
-            var password = $("#password").val();
-            var dynamic = $("#dynamic").val();
-            var csrf = $("#csrf_token").val();
-            var mydata = { 'username': username, 
-                          'password': password,
-                          'csrf_token':csrf,
-                          'dynamic':dynamic };
-            $.post(
-                "/login",
-                mydata,
-                function (data, status) {
-                    alert("status: " + data.status);
-                    if (data.status == "fail") {
-                        location.reload();
-                    } else {
-                        window.location.href = "/test";
-                    }
-                });
-        });
-    });
-</script>
-{%  endblock %}
+    <div class="container">
+        <div class="row h-100">
+            <div class="col-sm-12 my-auto">
+                <div class="card card-block w-50 mx-auto">
+                    <form>
+                        <div class="form-group">
+                            <label for="username">username</label>
+                            <input id="username" class="form-control" name="username" type="text" value="">
+                        </div>
+                        <div class="form-group">
+                            <label for="password">password</label>
+                            <input id="password" class="form-control" name="password" type="password" value="">
+                        </div>
+                        <div class="form-group">
+                            <label for="opt">opt</label>
+                            <input id="opt" class="form-control" name="opt" type="text" value="">
+                        </div>
+                        <p>Do not have an account? <a href="/register">Registration</a></p>
+                    </form>
+                    <button id="login" class="btn btn-primary">Login</button>
+                </div>
+            </div>
+        </div>
 
+
+    </div>
+    {%  block js %}
+    <script src="{{ url_for('static', filename = 'styles/jQuery/jquery-3.5.1.js')}}"></script>
+    <script src="{{ url_for('static', filename = 'styles/sha-256/sha256.js')}}"></script>
+    <script src="{{ url_for('static', filename = 'styles/bootstrap-js/bootstrap.min.js')}}"></script>
+    <script src="{{ url_for('static', filename = 'styles/bootstrap-js/bootstrap.bundle.min.js')}}"></script>
+    <script>
+        $(document).ready(function () {
+            $("#login").click(function () {
+                var username = $("#username").val();
+                var password = sha256($("#password").val());
+                alert(password)
+                var opt = $('#opt').val();
+                var mydata = { 'username': username, 'password': password, 'opt': opt };
+                $.post(
+                    "/check",
+                    mydata,
+                    function (data, status) {
+                        alert("status: " + data.status);
+                        if (data.status == "fail") {
+                            location.reload();
+                        } else {
+                            window.location.href = "/indextest";
+                        }
+                    });
+            });
+        });
+    </script>
+    {%  endblock %}
 </body>
+
 </html>

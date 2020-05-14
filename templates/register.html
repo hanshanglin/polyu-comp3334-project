@@ -1,54 +1,146 @@
-<!doctype html>
-
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
-  <meta charset="utf-8">
-  <title>Register</title>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/bootstrap-css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/bootstrap-css/bootstrap-grid.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/bootstrap-css/bootstrap-reboot.min.css') }}">
 </head>
 
 <body>
-  <h1>Register</h1>
+    <div class="container">
+        <form>
+            {{ form.csrf_token }}
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input id="username" class="form-control" name="username" type="text" value="">
+                <div id="usernameMessage" style="display: none;">
+                    <p id="usernameError">This username has been used!</p>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input id="password" class="form-control" name="password" type="password" value="">
+                <div id="passwordMessage" style="display: none;">
+                    <p id="passwordError">Your password should contains at least:</p>
+                    <p id="letter">A <b>lowercase </b>character</p>
+                    <p id="upper">A <b>uppercase </b>character</p>
+                    <p id="number">A <b>number </b></p>
+                    <p id="length">Minimum <b>8 characters</b></p>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="repassword">Confirm Password</label>
+                <input id="repassword" class="form-control" name="repassword" type="password" value="">
+                <div id="rePasswordMessage" style="display: none;">
+                    <p id="rePasswordError">The repassword is different.</p>
+                </div>
+            </div>
+            <input id="submit" name="submit" type="submit" value="submit">
+        </form>
 
-  <div class="container">
-    <form>
-      username: <input id="username" name="username" type="text" placeholder="username" value="">
-      password: <input id="password" name="password" type="password" value="">
-      repassword: <input id="repassword" name="repassword" type="password" value="">
-      {{ form.csrf_token }}
-    </form>
-    <button id="regist">regist</button>
-  </div>
+    </div>
 
+    {%  block js %}
+    <script src="{{ url_for('static', filename = 'styles/jQuery/jquery-3.5.1.js')}}"></script>
+    <script src="{{ url_for('static', filename = 'styles/sha-256/sha256.js')}}"></script>
+    <script>
+        $(document).ready(function () {
 
-  {%  block js %}
-  <script src="http://code.jquery.com/jquery-1.8.3.min.js"></script>
-  <script>
-    $(document).ready(function () {
-      $("#regist").click(function () {
-        var username = $("#username").val();
-        var password = $("#password").val();
-        var repassword = $("#repassword").val();
-        var csrf = $("#csrf_token").val();
-        var mydata = { 'username': username, 'password': password, 'repassword': repassword, 'csrf_token': csrf };
-        $.post(
-          "/register",
-          mydata,
-          function (data, status) {
-            alert("status: " + data.status + "    msg: " + data.msg);
-            if (data.status == "fail") {
-              location.reload();
-            } else {
-              window.location.href = "/login";
-            }
-          });
-      });
-    });
-  </script>
-  {%  endblock %}
-  </form>
+            //var isValid = true;
+            // move on the password and show.
+            $("#password").focus(function () {
+                $("#passwordMessage").show();
+            });
+            // move out on the password and hide.
+            /*$("#password").blur(function () {
+                $("#passwordMessage").hide();
+            });*/
+            $("#password").keyup(function () {
+                var isValid = true;
+                var lowerCaseLetters = /[a-z]/g;
+                var upperCaseLetters = /[A-Z]/g;
+                var number = /[0-9]/g;
+                var password = $("#password").val();
 
+                if (password.match(lowerCaseLetters)) {
+                    $("#letter").hide();
+                } else {
+                    $("#letter").show();
+                    isValid = false;
+                }
+                if (password.match(upperCaseLetters)) {
+                    $("#upper").hide();
+                } else {
+                    $("#upper").show();
+                    isValid = false;
+                }
+                if (password.match(number)) {
+                    $("#number").hide();
+                } else {
+                    $("#number").show();
+                    isValid = false;
+                }
+                if (password.length < 8) {
+                    $("#length").show();
+                    isValid = false;
+                } else {
+                    $("#length").hide();
+                }
+                if (isValid) {
+                    $("#passwordError").hide();
+                } else {
+                    $("#passwordError").show();
+                }
+            });
+
+            var isRepasswordValid = true;
+            $("#repassword").keyup(function () {
+                var password = $("#password").val();
+                var repassword = $("#repassword").val();
+                if (password.match(repassword)) {
+                    $("#rePasswordMessage").hide();
+                }
+                else {
+                    console.log("do not match")
+                    $("#rePasswordMessage").show();
+                }
+            })
+
+            $("#repassword").blur(function () {
+                var password = $("#password").val();
+                var repassword = $("#repassword").val();
+                if (repassword.length != password.length) {
+                    $("#rePasswordMessage").show();
+                }
+            })
+
+            $("#submit").click(function () {
+                event.preventDefault();
+                var username = $("#username").val();
+                var password = $("#password").val();
+                var csrf_token = $('#csrf_token').val();
+                password = sha256(password);
+                var mydata = { 'csrf_token': csrf_token, 'username': username, 'password': password };
+                $.post(
+                    "/register",
+                    mydata,
+                    function (data, status) {
+                        alert("status: " + data.status + "msg: " + data.msg);
+                        if (data.status == "ERR") {
+                            alert(data.msg)
+                            location.reload();
+                        } else {
+                            window.location.href = "/";
+                        }
+                    });
+            });
+        });
+    </script>
+    {%  endblock %}
 </body>
 
 </html>
