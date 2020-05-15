@@ -1,7 +1,7 @@
 <nav class="navbar navbar-fixed-top navbar-inverse bg-dark p-n2" style="height: 8%;">
     <div class="container">
         <div class="navbar-header">
-            <a class="navbar-brand" href="/test">COMP4434 Project</a>
+            <a class="navbar-brand" href="/test">OBSIDIAN</a>
         </div>
         <div class="dropdown">
             <button class="btn btn-secondary dropdown-toggle bg-dark" type="button" id="dropdownMenuButton"
@@ -20,8 +20,12 @@
                 </svg>
             </button>
             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                {% if User %}
+                <a class="dropdown-item" href="/logout">Logout</a>
+                {% else %}
                 <a class="dropdown-item" href="/login">Login</a>
                 <a class="dropdown-item" href="/register">Register</a>
+                {% endif %}
             </div>
         </div>
 
