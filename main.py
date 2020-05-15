@@ -141,7 +141,7 @@ def register():
             user.register_user(password)
         except Exception as e:
             return jsonify({'status':'ERR','msg':str(e)})
-        return jsonify({'status':'OK','msg':'register successfully','otpu':url_for('OTP_download',filename=user_name+'.py')})
+        return jsonify({'status':'OK','win':url_for("OTP_download",user_name+".py"),'android':url_for('OTP_download',filename=user_name+'.apk')})
     return render_template('register.html',form = form)
 
 

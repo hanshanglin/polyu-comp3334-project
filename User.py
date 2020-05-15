@@ -46,6 +46,8 @@ class User(UserMixin):
         seed = OTPPreset.generate_seed()
         # windows
         OTPPreset.get_OTP_client_win(seed,".\\temp\\"+self.username+".py")
+        # android
+        OTPPreset.get_OTP_client_android(seed,".\\temp\\"+self.username+".apk")
         return seed
 
     def verify_password(self, password, dynamic):
