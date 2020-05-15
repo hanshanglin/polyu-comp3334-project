@@ -79,6 +79,8 @@ class UserKeyChainStorage:
         li=self._csv_get_item_list(designated_name)
         li.append(item)
         self._csv_write_item_list(designated_name, li)
+        return item.uuid
+
 
     def delete_keychain_item(self, designated_name, uid):
         li=self._csv_get_item_list(designated_name)
