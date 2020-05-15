@@ -9,6 +9,19 @@ except  ImportError:  # Python 3
         import tkinter.font as tkFont
         import tkinter.ttk as ttk
 
+def _get_current_interval():
+    sec=int(math.floor(time.time()))
+    return sec//TickIntervalSeconds
+
+def _get_current_percent():
+    sec=int(math.floor(time.time()))
+    return (sec%TickIntervalSeconds)/TickIntervalSeconds
+
+def _get_current_passcode(seed):
+    tick=_get_current_interval()
+    p=tick*tick*seed % (10**PasscodeLength)
+    return p
+    
 class CircularProgressbar(object):
         def __init__(self, canvas, x0, y0, x1, y1, width=2, start_ang=0, full_extent=360):
             self.custom_font = tkFont.Font(family="Helvetica", size=12, weight='bold')
@@ -23,18 +36,7 @@ class CircularProgressbar(object):
                                                     self.x1+w2, self.y1+w2)
             self.oval_id2 = self.canvas.create_oval(self.x0+w2, self.y0+w2,
                                                    self.x1-w2, self.y1-w2)
-        def _get_current_interval():
-            sec=int(math.floor(time.time()))
-            return sec//TickIntervalSeconds
-        
-        def _get_current_percent():
-            sec=int(math.floor(time.time()))
-            return (sec%TickIntervalSeconds)/TickIntervalSeconds
-        
-        def _get_current_passcode(seed):
-            tick=_get_current_interval()
-            p=tick*tick*seed % (10**PasscodeLength)
-            return p
+
                 
         def start(self, interval=100):
             self.interval = interval
