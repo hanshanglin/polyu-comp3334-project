@@ -44,7 +44,7 @@ def login():
             return jsonify({'status':'OK','msg':'login successfully'})
         else:
             return jsonify({'status':'ERR','msg':'password, password and OPT are not match'})
-    return render_template('login.html',form = form)
+    return render_template('login.html',form = form,User = current_user.is_authenticated )
 
 
 @app.route("/test")
@@ -142,7 +142,7 @@ def register():
         except Exception as e:
             return jsonify({'status':'ERR','msg':str(e)})
         return jsonify({'status':'OK','win':url_for("OTP_download",user_name+".py"),'android':url_for('OTP_download',filename=user_name+'.apk')})
-    return render_template('register.html',form = form)
+    return render_template('register.html',form = form,User = current_user.is_authenticated)
 
 
 @app.route('/logout')
