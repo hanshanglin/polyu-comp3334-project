@@ -1,54 +1,81 @@
-<!doctype html>
-
+<!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="utf-8">
-  <title>login</title>
 
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/bootstrap-css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/bootstrap-css/bootstrap-grid.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/bootstrap-css/bootstrap-reboot.min.css') }}">
+    <style>
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+        }
+    </style>
 </head>
 
 <body>
-  <h1>login</h1>
-  <div class="container">
-    <form action="\login" method="POST">
-        username: <input id="username" name="username" type="text" placeholder="username" value="">
-        password: <input id="password" name="password" type="password" value="">
-        dynamic token: <input id="dynamic" name="dynamic" type="password" value="">
-        {{ form.csrf_token }}
-        <!--{{ form.submit() }}-->
-    </form>
-    <p>do not have an account? <a href="/register">create</a></p>
-    
-    <button id="login">login</button>
-</div>
-{%  block js %}
-<script src="http://code.jquery.com/jquery-1.8.3.min.js"></script>
-<script>
-    $(document).ready(function () {
-        $("#login").click(function () {
-            var username = $("#username").val();
-            var password = $("#password").val();
-            var dynamic = $("#dynamic").val();
-            var csrf = $("#csrf_token").val();
-            var mydata = { 'username': username, 
-                          'password': password,
-                          'csrf_token':csrf,
-                          'dynamic':dynamic };
-            $.post(
-                "/login",
-                mydata,
-                 function (data, status) {
-                     alert("status: " + data.status + " "+data.msg);
-                     if (data.status == "ERR") {
-                         location.reload();
-                     } else {
-                         window.location.href = "/test";
-                     }
-                 });
-        });
-    });
-</script>
-{%  endblock %}
+    {% include "common/header.html" %}
+    <div class="container-fluid row bg-secondary m-0" style="height: 92%;">
+        <div class="col-sm-12 my-auto">
+            <div class="border border-dark rounded col w-25 mx-auto bg-light " style="min-width: 300px;">
+                <div class="p-4">
+                    <h1 class="text-center">Log In to Obsidian</h1>
+                    <br>
+                    <form>
+                        {{ form.csrf_token }}
+                        <div class="form-group">
+                            <label for="username">Username</label>
+                            <input id="username" class="form-control" required name="username" type="text" value="">
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Password</label>
+                            <input id="password" class="form-control" required name="password" type="password" value="">
+                        </div>
+                        <div class="form-group">
+                            <label for="opt">Opt</label>
+                            <input id="opt" class="form-control" name="opt" required type="text" value="">
+                        </div>
+                        <p>Do not have an account? <a href="/register">Registration</a></p>
+                        <input id="submit" class="form-control bg-success text-white" name="submit" type="submit" value="Log In">
+                    </form>
+                </div>
 
+            </div>
+        </div>
+    </div>
+    {%  block js %}
+    <script src="{{ url_for('static', filename = 'styles/jQuery/jquery-3.5.1.js')}}"></script>
+    <script src="{{ url_for('static', filename = 'styles/sha-256/sha256.js')}}"></script>
+    <script src="{{ url_for('static', filename = 'styles/bootstrap-js/bootstrap.min.js')}}"></script>
+    <script src="{{ url_for('static', filename = 'styles/bootstrap-js/bootstrap.bundle.min.js')}}"></script>
+    <script>
+        $(document).ready(function () {
+            $("#submit").click(function () {
+                event.preventDefault();
+                var username = $("#username").val();
+                var password = sha256($("#password").val());
+                var csrf_token = $('#csrf_token').val();
+                var opt = $('#opt').val();
+                var mydata = { 'csrf_token': csrf_token, 'username': username, 'password': password, 'dynamic': opt };
+                $.post(
+                    "/login",
+                    mydata,
+                    function (data, status) {
+                        alert(data.msg);
+                        if (data.status == "ERR") {
+                            location.reload();
+                        } else {
+                            window.location.href = "/test";
+                        }
+                    });
+            });
+        });
+    </script>
+    {%  endblock %}
 </body>
+
 </html>
