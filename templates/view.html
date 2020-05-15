@@ -31,12 +31,37 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
     <script src="https://cdn.datatables.net/responsive/2.0.2/js/dataTables.responsive.min.js"></script>
     <script rel="stylesheet" src="{{ url_for('static',filename='js/dataTables.altEditor.free.js') }}"></script>
-    <script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>
+	<script>
+		var key = CryptoJS.enc.Utf8.parse("1234123412ABCDEF");  
+    	var iv = CryptoJS.enc.Utf8.parse('ABCDEF1234123412');
+		function Decrypt(word) {
+			let encryptedHexStr = CryptoJS.enc.Hex.parse(word);
+			let srcs = CryptoJS.enc.Base64.stringify(encryptedHexStr);
+			let decrypt = CryptoJS.AES.decrypt(srcs, key, { iv: iv, mode: CryptoJS.mode.CBC, padding: CryptoJS.pad.Pkcs7 });
+			let decryptedStr = decrypt.toString(CryptoJS.enc.Utf8);
+			return decryptedStr.toString();
+    	}
+
+		function Encrypt(word) {
+			let srcs = CryptoJS.enc.Utf8.parse(word);
+			let encrypted = CryptoJS.AES.encrypt(srcs, key, { iv: iv, mode: CryptoJS.mode.CBC, padding: CryptoJS.pad.Pkcs7 });
+			return encrypted.ciphertext.toString();
+    	}
+
+		// For testing
+		var word = '123123';
+		en = Encrypt(word);
+		console.log("Encrypted", en);
+		de = Decrypt(en);
+		console.log("Decrypted", de);
+	</script>
+	<script>
         $(document).ready(
 
 
             function () {
-
+				 
                 let result = [];
                 $.ajax({
                     type: "post",
@@ -47,6 +72,7 @@
                         result = msg['data'];
                     }
                 });
+				console.log('result is', result);
                 var columnDefs = [{
                     data: "uuid",
                     title: "uuid",
@@ -68,7 +94,8 @@
                     data: "comment",
                     title: "comment."
                 }];
-                var myTable;
+				
+				var myTable;
                 myTable = $('#table').DataTable({
                     "sPaginationType": "full_numbers",
                     data: result,
@@ -93,8 +120,10 @@
                         text: 'Delete',
                         name: 'delete'      // do not change name
                     }],
+					
                     onAddRow: function (datatable, rowdata, success, error) {
                         rowdata['type'] = 'ADD';
+						rowdata = Encrypt(rowdata);
                         $.ajax({
                             // a tipycal url would be / with type='PUT'
                             url:"/updateKeyChain",
@@ -108,6 +137,7 @@
                     },
                     onDeleteRow: function (datatable, rowdata, success, error) {
                         rowdata['type'] = 'DEL';
+						rowdata = Encrypt(rowdata);
                         $.ajax({
                             // a tipycal url would be / with type='PUT'
                             url:"/updateKeyChain",
@@ -121,6 +151,7 @@
                     },
                     onEditRow: function (datatable, rowdata, success, error) {
                         rowdata['type'] = 'EDI';
+						rowdata = Encrypt(rowdata);
                         $.ajax({
                             // a tipycal url would be / with type='PUT'
                             url:"/updateKeyChain",
