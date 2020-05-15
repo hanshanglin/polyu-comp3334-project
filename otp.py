@@ -28,7 +28,14 @@ class OTP:
         return p
 
     def check(self, seed, passcode):
-        return self._get_current_passcode()==passcode
+        _passcode=int(passcode)
+        if isinstance(passcode, str):
+            _passcode=0
+            a=1
+            for i in range(self.PasscodeLength):
+                _passcode=_passcode+a*int(passcode[-1-i])
+                a*=10
+        return self._get_current_passcode(seed)==_passcode
 
     def get_OTP_client_android(self, seed, designated_name=None):
         if designated_name==None:
@@ -59,3 +66,4 @@ if __name__=="__main__":
     print(_otpobject._get_current_interval())
     print(_otpobject._get_current_passcode(_sd))
     print(_otpobject.get_OTP_client_win(_sd))
+    print(_otpobject.check(_sd,str(_otpobject._get_current_passcode(_sd)).zfill(6)))
