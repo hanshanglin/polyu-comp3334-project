@@ -107,7 +107,7 @@ def update_key_chain():
         # add
         uuid = KeyChainStorage.add_keychain_item(des,l['weburl'],l['username'],l['password'],l['comment'])
         return jsonify({
-            'uuid':123456789,
+            'uuid':uuid,
             'weburl':l['weburl'],
             'username':l['username'],
             'password':l['password'],
@@ -141,7 +141,7 @@ def register():
             user.register_user(password)
         except Exception as e:
             return jsonify({'status':'ERR','msg':str(e)})
-        return jsonify({'status':'OK','win':url_for("OTP_download",user_name+".py"),'android':url_for('OTP_download',filename=user_name+'.apk')})
+        return jsonify({'status':'OK','win':url_for("OTP_download",filename=user_name+".py"),'android':url_for('OTP_download',filename=user_name+'.apk')})
     return render_template('register.html',form = form,User = current_user.is_authenticated)
 
 
