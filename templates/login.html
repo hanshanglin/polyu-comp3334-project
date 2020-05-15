@@ -8,35 +8,44 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/bootstrap-css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/bootstrap-css/bootstrap-grid.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/bootstrap-css/bootstrap-reboot.min.css') }}">
+    <style>
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+        }
+    </style>
 </head>
 
 <body>
-    <div class="container">
-        <div class="row h-100">
-            <div class="col-sm-12 my-auto">
-                <div class="card card-block w-50 mx-auto">
+    {% include "common/header.html" %}
+    <div class="container-fluid row bg-secondary m-0" style="height: 92%;">
+        <div class="col-sm-12 my-auto">
+            <div class="border border-dark rounded col w-25 mx-auto bg-light " style="min-width: 300px;">
+                <div class="p-4">
+                    <h1 class="text-center">Log In to Obsidian</h1>
+                    <br>
                     <form>
                         {{ form.csrf_token }}
                         <div class="form-group">
                             <label for="username">Username</label>
-                            <input id="username" class="form-control" name="username" type="text" value="">
+                            <input id="username" class="form-control" required name="username" type="text" value="">
                         </div>
                         <div class="form-group">
                             <label for="password">Password</label>
-                            <input id="password" class="form-control" name="password" type="password" value="">
+                            <input id="password" class="form-control" required name="password" type="password" value="">
                         </div>
                         <div class="form-group">
-                            <label for="opt">opt</label>
-                            <input id="opt" class="form-control" name="opt" type="text" value="">
+                            <label for="opt">Opt</label>
+                            <input id="opt" class="form-control" name="opt" required type="text" value="">
                         </div>
                         <p>Do not have an account? <a href="/register">Registration</a></p>
-                        <input id="submit" class="form-control" name="submit" type="submit" value="submit">
+                        <input id="submit" class="form-control bg-success text-white" name="submit" type="submit" value="Log In">
                     </form>
-                    </div>
+                </div>
+
             </div>
         </div>
-
-
     </div>
     {%  block js %}
     <script src="{{ url_for('static', filename = 'styles/jQuery/jquery-3.5.1.js')}}"></script>
@@ -51,7 +60,7 @@
                 var password = sha256($("#password").val());
                 var csrf_token = $('#csrf_token').val();
                 var opt = $('#opt').val();
-                var mydata = {'csrf_token': csrf_token, 'username': username, 'password': password, 'dynamic': opt };
+                var mydata = { 'csrf_token': csrf_token, 'username': username, 'password': password, 'dynamic': opt };
                 $.post(
                     "/login",
                     mydata,
