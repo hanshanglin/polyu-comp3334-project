@@ -1,76 +1,141 @@
 <!doctype html>
 <html>
-  <head>
+
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>View | Obsidian</title>
-	<script src="static/jquery.min.js"></script>
+    <title>View | Obsidian</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.11/css/jquery.dataTables.min.css" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.1.2/css/buttons.dataTables.min.css" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/select/1.1.2/css/select.dataTables.min.css" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.0.2/css/responsive.dataTables.min.css" />
 
-  </head>
-  <body>
-	<h1>Welcome</h1>
-	<hr>
-	<div id="createtable">
-		{%  block js %}
-		<script>
-		$.getJSON("/mytable",function(data){
-            if(data.length > 0)
-            {
-                $("#createtable").empty();
-                var table=$("<table border='1' cellspacing='0'> </table>");
-                table.appendTo($("#createtable"));
+</head>
 
-                var trh=$("<tr></tr>");
-                trh.appendTo(table);
+<body>
+    <h1>Welcome</h1>
+    <hr>
+    <div class="container">
+        <table cellpadding="0" cellspacing="0" border="0" class="dataTable table table-striped" id="table">
+        </table>
+    </div>
 
-                for(var h=0; h<data[0].length; h++)
-                {
-                    var th = $("<th>" +data[0][h]+"</th>");
-                    th.appendTo(trh);
-                }
 
-                for(var r=1; r<data.length; r++)
-                {
-                    var tr=$("<tr></tr>");
-                    tr.appendTo(table);
+    <!--初始化代码-->
+    <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.11/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/1.1.2/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/select/1.1.2/js/dataTables.select.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.0.2/js/dataTables.responsive.min.js"></script>
+    <script rel="stylesheet" src="{{ url_for('static',filename='js/dataTables.altEditor.free.js') }}"></script>
+    <script>
+        $(document).ready(
 
-                    for(var j=0;j<data[r].length;j++)
-                    {
-                        var td=$("<td>"+data[r][j]+"</td>");
-                        td.appendTo(tr);
+
+            function () {
+
+                let result = [];
+                $.ajax({
+                    type: "post",
+                    async: false,
+                    url: "/getKeyChain",
+                    data: {},
+                    success: function (msg) {
+                        result = msg['data'];
                     }
-                }
-            }
-        });
-		</script>
-		{%  endblock %}
-	</div><br>
-	<h2>Add</h2>
-	<form action="/add" method='post'>
-	Website: <input type="text" name="Website" id="website">
-	Username: <input type="text" name="Username" id="username"><br>
-	Password: <input type="text" name='Password' id='password'>
-	Note: <input type="text" name='Note' id='note'><br>
-	<input type="submit" value="Add to Database">
-	</form>
-	
-	<h2>Delete</h2>
-	<form action="/delete" method='post'>
-	Enter the ID of the line you want to delete.<br>
-	ID: <input type="text" name="Id" id="id"><br>
-	<input type="submit" value="Delete">
-	</form>
-	
-	<h2>Modify</h2>
-	<form action="/modify" method='post'>
-	
-	ID: <input type="text" name="MId" id="mid"><br>
-	Website: <input type="text" name="MWebsite" id="mwebsite">
-	Username: <input type="text" name="MUsername" id="musername"><br>
-	Password: <input type="text" name='MPassword' id='mpassword'>
-	Note: <input type="text" name='MNote' id='mnote'><br>
-	<input type="submit" value="Modify">
-	</form>
-	
-  </body>
+                });
+                var columnDefs = [{
+                    data: "uuid",
+                    title: "uuid",
+                    type: "readonly"
+                },
+                {
+                    data: "weburl",
+                    title: "website"
+                },
+                {
+                    data: "username",
+                    title: "username"
+                },
+                {
+                    data: "password",
+                    title: "password"
+                },
+                {
+                    data: "comment",
+                    title: "comment."
+                }];
+                var myTable;
+                myTable = $('#table').DataTable({
+                    "sPaginationType": "full_numbers",
+                    data: result,
+                    columns: columnDefs,
+                    dom: 'Bfrtip',        // Needs button container
+                    select: 'single',
+                    responsive: true,
+                    altEditor: true,     // Enable altEditor
+                    buttons: [{
+                        text: 'Add',
+                        name: 'add'        // do not change name
+                    },
+
+                    {
+                        extend: 'selected', // Bind to Selected row
+                        text: 'Edit',
+                        name: 'edit'        // do not change name
+                    },
+
+                    {
+                        extend: 'selected', // Bind to Selected row
+                        text: 'Delete',
+                        name: 'delete'      // do not change name
+                    }],
+                    onAddRow: function (datatable, rowdata, success, error) {
+                        rowdata['type'] = 'ADD';
+                        $.ajax({
+                            // a tipycal url would be / with type='PUT'
+                            url:"/updateKeyChain",
+                            datatype: "json",
+                            contentType: 'application/json; charset=UTF-8',
+                            data: JSON.stringify(rowdata),
+                            type: 'POST',
+                            success: success,
+                            error: error
+                        });
+                    },
+                    onDeleteRow: function (datatable, rowdata, success, error) {
+                        rowdata['type'] = 'DEL';
+                        $.ajax({
+                            // a tipycal url would be / with type='PUT'
+                            url:"/updateKeyChain",
+                            type: 'POST',
+                            datatype: "json",
+                            contentType: 'application/json; charset=UTF-8',
+                            data: JSON.stringify(rowdata),
+                            success: success,
+                            error: error
+                        });
+                    },
+                    onEditRow: function (datatable, rowdata, success, error) {
+                        rowdata['type'] = 'EDI';
+                        $.ajax({
+                            // a tipycal url would be / with type='PUT'
+                            url:"/updateKeyChain",
+                            type: 'POST',
+                            datatype: "json",
+                            contentType: 'application/json; charset=UTF-8',
+                            data: JSON.stringify(rowdata),
+                            success: success,
+                            error: error
+                        });
+                    }
+                    
+                });
+
+            });
+    </script>
+</body>
+
 </html>

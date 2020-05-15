@@ -28,7 +28,7 @@ class OTP:
         return p
 
     def check(self, seed, passcode):
-        return self._get_current_passcode()==passcode
+        return str(self._get_current_passcode(seed))==str(passcode)
 
     def get_OTP_client_android(self, seed, designated_name=None):
         if designated_name==None:

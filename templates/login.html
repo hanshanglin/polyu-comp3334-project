@@ -10,13 +10,15 @@
 <body>
   <h1>login</h1>
   <div class="container">
-    <form>
+    <form action="\login" method="POST">
         username: <input id="username" name="username" type="text" placeholder="username" value="">
         password: <input id="password" name="password" type="password" value="">
-        dynamic token: <input id="dynamic" name="password" type="password" value="">
+        dynamic token: <input id="dynamic" name="dynamic" type="password" value="">
         {{ form.csrf_token }}
+        <!--{{ form.submit() }}-->
     </form>
     <p>do not have an account? <a href="/register">create</a></p>
+    
     <button id="login">login</button>
 </div>
 {%  block js %}
@@ -35,14 +37,14 @@
             $.post(
                 "/login",
                 mydata,
-                function (data, status) {
-                    alert("status: " + data.status);
-                    if (data.status == "fail") {
-                        location.reload();
-                    } else {
-                        window.location.href = "/test";
-                    }
-                });
+                 function (data, status) {
+                     alert("status: " + data.status + " "+data.msg);
+                     if (data.status == "ERR") {
+                         location.reload();
+                     } else {
+                         window.location.href = "/test";
+                     }
+                 });
         });
     });
 </script>

@@ -17,6 +17,9 @@ login_manager = LoginManager()
 login_manager.session_protection = 'strong'
 login_manager.login_view = 'login' # default login page
 login_manager.init_app(app=app)
+login_manager.login_message=u'please login before'
+login_manager.login_message_category='info'
+
 
 # reload User object，by session->user id
 @login_manager.user_loader
@@ -65,6 +68,12 @@ def OTP_download(filename):
         headers={'Content-Disposition': 'attachment', 'filename': filename}
     )
 
+@app.route('/view',methods=['POST','GET'])
+@login_required
+def view_page():
+    return render_template("view.html")
+
+@csrf.exempt
 @app.route('/getKeyChain',methods=['POST','GET'])
 @login_required
 def request_key_chain():
@@ -84,31 +93,40 @@ def request_key_chain():
     res['data'] = li
     return jsonify(res)
 
+@csrf.exempt
 @app.route('/updateKeyChain',methods=['POST','GET'])
 @login_required
 def update_key_chain():
     user = current_user._get_current_object()
     des = user.keychain
-    l = request.form['data']
+    l = request.get_json()
     if l==None:
         return jsonify({'status':'ERR', 'msg':"No data found"})
-
-    res = {'status':"OK"}
-    cnt = 0
-    for i in l:
-        if 'uuid' not in i.keys():
-            # add
-            KeyChainStorage.add_keychain_item(des,i['weburl'],i['username'],i['password'],i['comment'])
-            cnt+=1
-        elif 'username' not in i.keys():
-            # del
-            KeyChainStorage.delete_keychain_item(des,i['uuid'])
-            cnt+=1
-        else:
-            # update
-            KeyChainStorage.update_keychain_item(des,i['uuid'],i['weburl'],i['username'],i['password'],i['comment'])
-            cnt+=1
-    res['finish']=cnt
+    res = {'status':"ERR"}
+    if l['type'] == 'ADD':
+        # add
+        uuid = KeyChainStorage.add_keychain_item(des,l['weburl'],l['username'],l['password'],l['comment'])
+        return jsonify({
+            'uuid':123456789,
+            'weburl':l['weburl'],
+            'username':l['username'],
+            'password':l['password'],
+            'comment':l['comment']
+        }) 
+    elif l['type'] == 'DEL':
+        # del
+        KeyChainStorage.delete_keychain_item(des,l['uuid'])
+        return jsonify({}) 
+    elif l['type'] == 'EDI':
+        # update
+        KeyChainStorage.update_keychain_item(des,l['uuid'],l['weburl'],l['username'],l['password'],l['comment'])
+        return jsonify({
+            'uuid':l['uuid'],
+            'weburl':l['weburl'],
+            'username':l['username'],
+            'password':l['password'],
+            'comment':l['comment']
+        }) 
     return jsonify(res)
 
 @app.route('/register',methods=['POST','GET'])

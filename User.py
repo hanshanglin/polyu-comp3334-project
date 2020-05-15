@@ -23,10 +23,6 @@ class User(UserMixin):
         
         :return dynamic seed
         """
-        # sha256 with 16 bits salt 
-        self.password_hash = generate_password_hash(password,salt_length=16)
-        self.seed = self.dynamic_seed()
-        self.keychain = KeyChainStorage.create_new_keychain()
         with open(PROFILES) as f:
             try:
                 profiles = json.load(f)
@@ -34,6 +30,10 @@ class User(UserMixin):
                 profiles = {}
         if self.username in profiles.keys():
             raise Exception("username has been registered")
+        # sha256 with 16 bits salt 
+        self.password_hash = generate_password_hash(password,salt_length=16)
+        self.keychain = KeyChainStorage.create_new_keychain()
+        self.seed = self.dynamic_seed()
         with open(PROFILES,'w') as f:
             profiles[self.username] = [self.password_hash,self.id,self.seed,self.keychain]
             f.write(json.dumps(profiles))
@@ -168,11 +168,11 @@ class User(UserMixin):
         if not user_id:
             return None
         try:
-            with open(PROFILES) as f:
+            with open(PROFILES,'r',encoding='utf-8') as f:
                 user_profiles = json.load(f)
-                for user_name, profile in user_profiles.iteritems():
+                for user_name, profile in user_profiles.items():
                     if profile[1] == user_id:
                         return User(user_name)
-        except:
+        except Exception as e:
             return None
         return None
