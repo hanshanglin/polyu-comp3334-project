@@ -25,17 +25,23 @@
 <body>
     {% include "common/header.html" %}
     <div class="container-fluid row m-0" style="height: 92%; background-color:rgb(235, 233, 233)">
-        <div class="col-4 mt-3">
-            <div class="list-group list-group-flush mt">
-                <div class="list-group" id="list-tab" role="tablist">
-                    <a class="list-group-item list-group-item-action active" id="list-Change-list" data-toggle="list"
-                        href="#list-Change" role="tab" aria-controls="Change">Change</a>
-                    <a class="list-group-item list-group-item-action" id="list-DeleteAccount-list" data-toggle="list"
-                        href="#list-DeleteAccount" role="tab" aria-controls="DeleteAccount">Delete Account</a>
+        <div class="col-1"></div>
+        <div class="col-3 mt-3">
+            <div class="bg-light">
+                <h1 class="text-center">Account
+                    Management</h1><br>
+                <div class="list-group list-group-flush mt">
+                    <div class="list-group" id="list-tab" role="tablist">
+                        <a class="list-group-item list-group-item-action active" id="list-Change-list"
+                            data-toggle="list" href="#list-Change" role="tab" aria-controls="Change">Modifacation</a>
+                        <a class="list-group-item list-group-item-action" id="list-DeleteAccount-list"
+                            data-toggle="list" href="#list-DeleteAccount" role="tab"
+                            aria-controls="DeleteAccount">Delete Account</a>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="col-8 mt-3 bg-light">
+        <div class="col-7 mt-3 bg-light">
             <div class="tab-content" id="nav-tabContent">
                 <div class="tab-pane fade show active " id="list-Change" role="tabpanel"
                     aria-labelledby="list-Change-list">
@@ -81,6 +87,7 @@
                 </div>
             </div>
         </div>
+        <div class="col-1"></div>
     </div>
     {% block js %}
     <script src="{{ url_for('static', filename = 'styles/jQuery/jquery-3.5.1.js')}}"></script>
@@ -89,7 +96,7 @@
     <script src="{{ url_for('static', filename = 'styles/bootstrap-js/bootstrap.min.js')}}"></script>
     <script>
 
-        $("#btnDelete").click(function(){
+        $("#btnDelete").click(function () {
             window.location.href = "/delete";
         })
 
