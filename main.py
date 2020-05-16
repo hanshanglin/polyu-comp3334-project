@@ -30,7 +30,7 @@ def load_user(user_id):
 csrf = CsrfProtect()
 csrf.init_app(app)
 
-
+@app.route('/', methods = ['GET', 'POST'])
 @app.route('/login',methods = ["POST","GET"])
 def login():
     form = LoginForm()
