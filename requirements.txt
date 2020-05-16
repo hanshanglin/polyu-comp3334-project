@@ -3,3 +3,5 @@ Werkzeug==0.16.0
 WTForms==2.2.1
 Flask==1.1.1
 Flask_Login==0.4.1
+schedule==any
+jdk>=1.1
