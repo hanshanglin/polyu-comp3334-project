@@ -22,7 +22,7 @@
 			
 			<button class="dt-button" onclick="changeKey()">Set Secondary Password</button>
 			<div class="dataTables_filter">
-				<label>Secondary Password: <input type="search" id="spwd" class placeholder></label>
+				<label>Secondary Password (1234 by default): <input type="search" id="spwd" value="1234" class placeholder></label>
 			</div>
 			
 		</div>
@@ -41,7 +41,7 @@
     <script rel="stylesheet" src="{{ url_for('static',filename='js/dataTables.altEditor.free.js') }}"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>
 	<script>
-		var key = CryptoJS.enc.Utf8.parse("1234123412ABCDEF"); 
+		var key = CryptoJS.enc.Utf8.parse("1234"); 
     	var iv = CryptoJS.enc.Utf8.parse('ABCDEF1234123412');
 		function Decrypt(word) {
 			let encryptedHexStr = CryptoJS.enc.Hex.parse(word);
@@ -57,12 +57,14 @@
 			return encrypted.ciphertext.toString();
         }
         function changeKey() {
-			key = document.getElementById("spwd").value;
-			console.log(key);
+			let keyvalue = document.getElementById("spwd").value;
+			var key = CryptoJS.enc.Utf8.parse(keyvalue);
+			console.log("keyvalue is: ",keyvalue);
 			var test = "test";
 			var en = Encrypt(test);
 			console.log("Test encrypted: ", en);
-			console.log("Test decrypted: ", Decrypt(en));
+			var de = Decrypt(en);
+			console.log("Test decrypted: ", de);
 		}
         function DecryptJson(j){
             for(var key in j){
@@ -80,12 +82,6 @@
             }
             return j;
         }
-		// For testing
-		var word = '123123';
-		en = Encrypt(word);
-		console.log("Encrypted", en);
-		de = Decrypt(en);
-        console.log("Decrypted", de);
         
 	</script>
 	<script>
