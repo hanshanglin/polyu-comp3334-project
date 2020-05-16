@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Account | Obsidian</title>
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='img/favicon.ico') }}" />
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/bootstrap-css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/bootstrap-css/bootstrap-grid.min.css') }}">
@@ -26,7 +26,7 @@
     {% include "common/header.html" %}
     <div class="container-fluid row m-0" style="height: 92%; background-color:rgb(235, 233, 233)">
         <div class="col-1"></div>
-        <div class="col-3 mt-3">
+        <div class="col-3 mt-3" style="min-width: 300px;">
             <div class="bg-light">
                 <h1 class="text-center">Account
                     Management</h1><br>
@@ -41,7 +41,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-7 mt-3 bg-light">
+        <div class="col-7 mt-3 bg-light" style="min-width: 450px;">
             <div class="tab-content" id="nav-tabContent">
                 <div class="tab-pane fade show active " id="list-Change" role="tabpanel"
                     aria-labelledby="list-Change-list">
