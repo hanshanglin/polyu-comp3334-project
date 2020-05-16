@@ -85,7 +85,7 @@
                                         <tr>
                                             <td><button id="dIdforAnd"
                                                     class="btn btn-primary btn-block">Android</button></td>
-                                            <td><button id="dIDforWin"
+                                            <td><button id="dIdforWin"
                                                     class="btn btn-primary btn-block">Windows</button></td>
                                         </tr>
                                         <tr>
@@ -231,6 +231,7 @@
                         } else {
                             dLinkforAnd = data.android;
                             dLinkforWin = data.win;
+                            console.log(dLinkforWin)
                             $("#dOPT").show();
                             $("#RForm").hide();
                         }
@@ -241,7 +242,12 @@
             })
 
             $("#dIdforWin").click(function () {
+
                 window.open(dLinkforWin, '_blank');
+            })
+
+            $("#dLog").click(function(){
+                window.location.href("/login");
             })
         });
 

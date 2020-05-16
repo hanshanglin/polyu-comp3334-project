@@ -17,6 +17,7 @@ class User(UserMixin):
         self.id = self.get_id()
         self.seed = self.get_dynamic_seed()
         self.keychain = self.get_keychain()
+        self.try_time,self.last_login_time = self.get_last_login_time()
 
     def register_user(self, password):
         """save user name, id and password hash to json file
@@ -35,7 +36,7 @@ class User(UserMixin):
         self.keychain = KeyChainStorage.create_new_keychain()
         self.seed = self.dynamic_seed()
         with open(PROFILES,'w') as f:
-            profiles[self.username] = [self.password_hash,self.id,self.seed,self.keychain]
+            profiles[self.username] = [self.password_hash,self.id,self.seed,self.keychain,0,time.time()]
             f.write(json.dumps(profiles))
 
     def dynamic_seed(self):
@@ -53,7 +54,22 @@ class User(UserMixin):
     def verify_password(self, password, dynamic):
         if self.password_hash is None or self.seed is None:
             return False
-        return check_password_hash(self.password_hash, password) and self.check_dynamic(dynamic)
+        
+        if self.try_time>=5 and time.time() - 600 < self.last_login_time:
+            return 2
+        if check_password_hash(self.password_hash, password):
+            if self.check_dynamic(dynamic):
+                self.try_time=0
+                self.last_login_time = time.time()
+                self.set_last_login_time()
+                return 1
+            else:
+                return 0
+        else:
+            self.try_time+=1
+            self.last_login_time = time.time()
+            self.set_last_login_time()
+            return 0
 
     def check_dynamic(self,dynamic):
         # (unixtime%1000 /30)^2 *seed_token %1000000
@@ -133,6 +149,34 @@ class User(UserMixin):
             except ValueError:
                 pass
         return unicode(uuid.uuid4())
+    
+    def get_last_login_time(self):
+        """get user last login time from profile file, if not exist, it return 0,current_time.
+        """
+        if self.username is not None:
+            try:
+                with open(PROFILES) as f:
+                    user_profiles = json.load(f)
+                    if self.username in user_profiles:
+                        return user_profiles[self.username][4],user_profiles[self.username][5]
+            except IOError:
+                pass
+            except ValueError:
+                pass
+        return 0,time.time()
+    
+    def set_last_login_time(self):
+        """set user last login time from profile file, if not exist, it return 0,current_time.
+        """
+        with open(PROFILES) as f:
+            try:
+                profiles = json.load(f)
+            except ValueError:
+                return 
+        with open(PROFILES,'w') as f:
+            profiles[self.username][4] = self.try_time
+            profiles[self.username][5] = self.last_login_time
+            f.write(json.dumps(profiles))
     
     def get_dynamic_passcode_client_android(self):
         """generate an OTP apk for user, returns: file name to the apk

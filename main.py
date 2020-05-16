@@ -39,9 +39,15 @@ def login():
         password = request.form.get('password', None)
         dynamic = request.form.get('dynamic',None)
         user = User(user_name)
-        if user.verify_password(password,dynamic):
+        state = user.verify_password(password,dynamic)
+
+        if state == 1:
+            # success
             login_user(user)
             return jsonify({'status':'OK','msg':'login successfully'})
+        if state == 2:
+            # block
+            return jsonify({'status':'ERR','msg':'There are too many errors in a short time, please try again after ten minutes'})
         else:
             return jsonify({'status':'ERR','msg':'password, password and OPT are not match'})
     return render_template('login.html',form = form,User = current_user.is_authenticated )
@@ -56,7 +62,7 @@ def test_target():
 @app.route('/getOtp/<filename>',methods = ["POST","GET"])
 def OTP_download(filename):
     file_path = ".\\temp\\"+filename
-    file_handle = open(file_path, 'r')
+    file_handle = open(file_path, 'r',encoding='gbk',errors='ignore')
 
     def stream_and_remove_file():
         yield from file_handle
