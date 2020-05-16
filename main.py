@@ -31,7 +31,7 @@ csrf = CsrfProtect()
 csrf.init_app(app)
 
 
-@app.route('/login',methods = ["POST","GET"])
+@app.route('/',methods = ["POST","GET"])
 def login():
     form = LoginForm()
     if form.validate_on_submit():
