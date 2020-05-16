@@ -6,9 +6,12 @@ google doc https://docs.google.com/document/d/1N0tYaY7E8IxfrW0oHHAEML5UdhBxL80Fo
 platform: flask+JS
 
 ## 运行：
-    python main.py  
-    前端模板丢到 **templates**  
-    后端代码我懒得搞引用了 直接丢一级文件夹
+    使用pip
+        pip install -r requirements.txt
+        python main.py
+    使用anaconda
+        conda install --yes --file requirements.txt
+        python main.py
 
 ## 文件结构： 
 - /security-project  
