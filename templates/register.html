@@ -16,6 +16,7 @@
             margin: 0;
         }
     </style>
+    {% include "common/checkLogin.html" %}
 </head>
 
 <body>
@@ -32,41 +33,68 @@
                 <div class="col-sm-4 ">
                     <div class=" border border-dark rounded col w-25 mx-auto bg-light " style="min-width: 400px;">
                         <div class="p-4">
-                            <h1 class="text-center">Registration</h1>
-                            <br>
-                            <form>
-                                {{ form.csrf_token }}
-                                <div class="form-group">
-                                    <label for="username">Username</label>
-                                    <input id="username" class="form-control" required name="username" type="text"
-                                        value="">
-                                    <div id="usernameMessage" style="display: none;">
-                                        <p id="usernameError">This username has been used!</p>
+                            <div id="RForm">
+                                <h1 class="text-center">Registration</h1>
+                                <br>
+                                <form>
+                                    {{ form.csrf_token }}
+                                    <div class="form-group">
+                                        <label for="username">Username</label>
+                                        <input id="username" class="form-control" required name="username" type="text"
+                                            value="">
+                                        <div id="usernameMessage" style="display: none;">
+                                            <p id="usernameError">This username has been used!</p>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="form-group">
-                                    <label for="password">Password</label>
-                                    <input id="password" class="form-control" required name="password" type="password"
-                                        value="">
-                                    <div id="passwordMessage" class="pt-2" style="display: none;">
-                                        <p id="passwordError">Your password should contains at least:</p>
-                                        <p id="letter">A <b>lowercase </b>character</p>
-                                        <p id="upper">A <b>uppercase </b>character</p>
-                                        <p id="number">A <b>number </b></p>
-                                        <p id="length">Minimum <b>8 characters</b></p>
+                                    <div class="form-group">
+                                        <label for="password">Password</label>
+                                        <input id="password" class="form-control" required name="password"
+                                            type="password" value="">
+                                        <div id="passwordMessage" class="pt-2" style="display: none;">
+                                            <p id="passwordError">Your password should contains at least:</p>
+                                            <p id="letter">A <b>lowercase </b>character</p>
+                                            <p id="upper">A <b>uppercase </b>character</p>
+                                            <p id="number">A <b>number </b></p>
+                                            <p id="length">Minimum <b>8 characters</b></p>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="form-group">
-                                    <label for="repassword">Confirm Password</label>
-                                    <input id="repassword" class="form-control" required name="repassword"
-                                        type="password" value="">
-                                    <div id="rePasswordMessage" class="pt-2" style="display: none;">
-                                        <p id="rePasswordError">The repassword is different.</p>
+                                    <div class="form-group">
+                                        <label for="repassword">Confirm Password</label>
+                                        <input id="repassword" class="form-control" required name="repassword"
+                                            type="password" value="">
+                                        <div id="rePasswordMessage" class="pt-2" style="display: none;">
+                                            <p id="rePasswordError">The repassword is different.</p>
+                                        </div>
                                     </div>
-                                </div>
-                                <input id="submit" class="form-control bg-success text-white" name="submit"
-                                    type="submit" value="Registration">
-                            </form>
+                                    <input id="submit" class="form-control bg-success text-white" name="submit"
+                                        type="submit" value="Registration">
+                                </form>
+                            </div>
+                            <div id="dOPT" style="display: none;">
+                                <h1 class="text-center">Download OPT</h1>
+                                <br>
+                                <table class="table table-bordered">
+                                    <tbody>
+                                        <tr>
+                                            <td colspan="2">You need to download the OPT in 30 minutes or the link will
+                                                be distroyed.</td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="2">Download link for:</td>
+                                        </tr>
+                                        <tr>
+                                            <td><button id="dIdforAnd"
+                                                    class="btn btn-primary btn-block">Android</button></td>
+                                            <td><button id="dIDforWin"
+                                                    class="btn btn-primary btn-block">Windows</button></td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="2"><button id="dLog" class="btn btn-success btn-block">Log
+                                                    in</button></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -176,6 +204,9 @@
                 }
             })
 
+            var dLinkforAnd;
+            var dLinkforWin;
+
             $("#submit").click(function () {
                 event.preventDefault();
                 if (!isPasswordValid) {
@@ -195,15 +226,27 @@
                     "/register",
                     mydata,
                     function (data, status) {
-                        alert(data.msg);
                         if (data.status == "ERR") {
-                            location.reload();
+                            alert(data.msg);
                         } else {
-                            window.location.href = "/login";
+                            dLinkforAnd = data.android;
+                            dLinkforWin = data.win;
+                            $("#dOPT").show();
+                            $("#RForm").hide();
                         }
                     });
             });
+            $("#dIdforAnd").click(function () {
+                window.open(dLinkforAnd, '_blank');
+            })
+
+            $("#dIdforWin").click(function () {
+                window.open(dLinkforWin, '_blank');
+            })
         });
+
+
+
     </script>
     {%  endblock %}
 </body>

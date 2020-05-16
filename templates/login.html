@@ -16,6 +16,7 @@
             margin: 0;
         }
     </style>
+    {% include "common/checkLogin.html" %}
 </head>
 
 <body>
@@ -41,7 +42,9 @@
                             <input id="opt" class="form-control" name="opt" required type="text" value="">
                         </div>
                         <p>Do not have an account? <a href="/register">Registration</a></p>
-                        <input id="submit" class="form-control bg-success text-white" name="submit" type="submit" value="Log In">
+                        <p id="errorMsg" style="display: hidden; color: red;"></p>
+                        <input id="submit" class="form-control bg-success text-white" name="submit" type="submit"
+                            value="Log In">
                     </form>
                 </div>
 
@@ -66,11 +69,10 @@
                     "/login",
                     mydata,
                     function (data, status) {
-                        alert(data.msg);
                         if (data.status == "ERR") {
-                            location.reload();
+                            $("#errorMsg").html(data.msg)
                         } else {
-                            window.location.href = "/test";
+                            window.location.href = "/view";
                         }
                     });
             });
