@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account | Obsidian</title>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='img/favicon.ico') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/bootstrap-css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/bootstrap-css/bootstrap-grid.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/bootstrap-css/bootstrap-reboot.min.css') }}">
+    <style>
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+        }
+
+        .Pages {
+            height: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    {% include "common/header.html" %}
+    <div class="container-fluid row m-0" style="height: 92%; background-color:rgb(235, 233, 233)">
+        <div class="col-1"></div>
+        <div class="col-3 mt-3" style="min-width: 300px;">
+            <div class="bg-light">
+                <h1 class="text-center">Account
+                    Management</h1><br>
+                <div class="list-group list-group-flush mt">
+                    <div class="list-group" id="list-tab" role="tablist">
+                        <a class="list-group-item list-group-item-action active" id="list-Change-list"
+                            data-toggle="list" href="#list-Change" role="tab" aria-controls="Change">Modifacation</a>
+                        <a class="list-group-item list-group-item-action" id="list-DeleteAccount-list"
+                            data-toggle="list" href="#list-DeleteAccount" role="tab"
+                            aria-controls="DeleteAccount">Delete Account</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-7 mt-3 bg-light" style="min-width: 450px;">
+            <div class="tab-content" id="nav-tabContent">
+                <div class="tab-pane fade show active " id="list-Change" role="tabpanel"
+                    aria-labelledby="list-Change-list">
+                    <div class=" w-25" style="min-width: 400px;">
+                        <div class="p-4">
+                            <div id="RForm">
+                                <form>
+                                    {{ form.csrf_token }}
+                                    <div class="form-group">
+                                        <label for="password">Modified Password</label>
+                                        <input id="password" class="form-control" required name="password"
+                                            type="password" value="">
+                                        <div id="passwordMessage" class="pt-2" style="display: none;">
+                                            <p id="passwordError">Your password should contains at least:</p>
+                                            <p id="letter">A <b>lowercase </b>character</p>
+                                            <p id="upper">A <b>uppercase </b>character</p>
+                                            <p id="number">A <b>number </b></p>
+                                            <p id="length">Minimum <b>8 characters</b></p>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="repassword">Confirm Password</label>
+                                        <input id="repassword" class="form-control" required name="repassword"
+                                            type="password" value="">
+                                        <div id="rePasswordMessage" class="pt-2" style="display: none;">
+                                            <p id="rePasswordError">The repassword is different.</p>
+                                        </div>
+                                    </div>
+                                    <input id="submit" class="form-control bg-success text-white" name="submit"
+                                        type="submit" value="Confirm">
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="list-DeleteAccount" role="tabpanel"
+                    aria-labelledby="list-DeleteAccount-list">
+                    <div class="mt-3">
+                        <button id="btnDelete" class="btn btn-danger"
+                            onclick="return confirm('Are you continue to Delete the account?')"><b>DELETE</b></button>
+                        <span><b>this account.</b></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-1"></div>
+    </div>
+    {% block js %}
+    <script src="{{ url_for('static', filename = 'styles/jQuery/jquery-3.5.1.js')}}"></script>
+    <script src="{{ url_for('static', filename = 'styles/sha-256/sha256.js')}}"></script>
+    <script src="{{ url_for('static', filename = 'styles/bootstrap-js/bootstrap.bundle.min.js')}}"></script>
+    <script src="{{ url_for('static', filename = 'styles/bootstrap-js/bootstrap.min.js')}}"></script>
+    <script>
+
+        $("#btnDelete").click(function () {
+            window.location.href = "/delete";
+        })
+
+        var isPasswordValid = true;
+        var isRepasswordValid = true;
+        // move on the password and show.
+        $("#password").focus(function () {
+            if (!isPasswordValid) {
+                $("#passwordMessage").show();
+            }
+
+        });
+        // move out on the password and hide.
+        $("#password").blur(function () {
+            if (isPasswordValid) {
+                $("#passwordMessage").hide();
+            }
+
+        });
+
+        $("#password").keyup(function () {
+            var isValid = true;
+            var lowerCaseLetters = /[a-z]/g;
+            var upperCaseLetters = /[A-Z]/g;
+            var number = /[0-9]/g;
+            var password = $("#password").val();
+
+            if (password.match(lowerCaseLetters)) {
+                $("#letter").hide();
+            } else {
+                $("#letter").show();
+                isValid = false;
+            }
+            if (password.match(upperCaseLetters)) {
+                $("#upper").hide();
+            } else {
+                $("#upper").show();
+                isValid = false;
+            }
+            if (password.match(number)) {
+                $("#number").hide();
+            } else {
+                $("#number").show();
+                isValid = false;
+            }
+            if (password.length < 8) {
+                $("#length").show();
+                isValid = false;
+            } else {
+                $("#length").hide();
+            }
+            isPasswordValid = isValid;
+            if (isValid) {
+                $("#passwordError").hide();
+                $("#passwordMessage").hide();
+            } else {
+                $("#passwordError").show();
+                $("#passwordMessage").show();
+            }
+            repassword = $("#repassword").val();
+            if (repassword.length != 0) {
+                if (repassword.match(password)) {
+                    isRepasswordValid = true;
+                    $("#rePasswordMessage").hide();
+                } else {
+                    isRepasswordValid = false;
+                    $("#rePasswordMessage").show();
+                }
+            }
+
+        });
+
+
+        $("#repassword").keyup(function () {
+            var password = $("#password").val();
+            var repassword = $("#repassword").val();
+            if (password.match(repassword)) {
+                isRepasswordValid = true;
+                $("#rePasswordMessage").hide();
+            }
+            else {
+                console.log("do not match")
+                isRepasswordValid = false;
+                $("#rePasswordMessage").show();
+            }
+        })
+
+        $("#repassword").blur(function () {
+            var password = $("#password").val();
+            var repassword = $("#repassword").val();
+            if (repassword.length != password.length) {
+                isRepasswordValid = false;
+                $("#rePasswordMessage").show();
+            }
+        })
+
+        $("#submit").click(function () {
+            event.preventDefault();
+            if (!isPasswordValid) {
+                alert("Password is not valid");
+                return;
+            }
+            if (!isRepasswordValid) {
+                alert("Password is not confirmed")
+                return;
+            }
+            var password = $("#password").val();
+            var csrf_token = $('#csrf_token').val();
+            password = sha256(password);
+            var mydata = { 'csrf_token': csrf_token, 'password': password };
+            $.post(
+                "/", //unfinished
+                mydata,
+                function (data, status) {
+                    //unfinished
+                });
+        });
+    </script>
+    {% endblock %}
+</body>
+
+
+</html>
