@@ -1,5 +1,5 @@
 <nav class="navbar navbar-fixed-top navbar-inverse bg-dark p-n2" style="height: 8%;">
-    <div class="container">
+    
         <div class="navbar-header">
             <a class="navbar-brand" href="/view">OBSIDIAN</a>
         </div>
@@ -21,6 +21,8 @@
             </button>
             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                 {% if User %}
+                <a class="dropdown-item" href="/account">Account</a>
+                <a class="dropdown-item" href="/view">view</a>
                 <a class="dropdown-item" href="/logout">Logout</a>
                 {% else %}
                 <a class="dropdown-item" href="/login">Login</a>
@@ -29,5 +31,5 @@
             </div>
         </div>
 
-    </div><!-- /.container -->
+    
 </nav><!-- /.navbar -->

@@ -5,7 +5,7 @@ from flask_login import login_user, login_required
 from flask_login import LoginManager, current_user
 from flask_login import logout_user
 import os
-from Form import LoginForm,RegisterForm
+from Form import LoginForm,RegisterForm,AccountForm
 import json
 from keychain import KeyChainStorage
 
@@ -77,7 +77,13 @@ def OTP_download(filename):
 @app.route('/view',methods=['POST','GET'])
 @login_required
 def view_page():
-    return render_template("view.html")
+    return render_template("view.html",User = current_user.is_authenticated)
+
+@app.route('/account',methods=['POST','GET'])
+@login_required
+def account():
+    form = AccountForm()
+    return render_template('account.html',form=form,User = current_user.is_authenticated)
 
 @csrf.exempt
 @app.route('/getKeyChain',methods=['POST','GET'])
