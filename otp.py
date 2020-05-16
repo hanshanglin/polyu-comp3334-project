@@ -2,6 +2,9 @@ import time
 import random
 import math
 import os
+import modapk_win
+
+__PLATFORM__="WINDOWS"
 
 class OTP:
     TickIntervalSeconds=30
@@ -40,6 +43,9 @@ class OTP:
     def get_OTP_client_android(self, seed, designated_name=None):
         if designated_name==None:
             designated_name="%08x"%random.getrandbits(32)+".apk"
+        if __PLATFORM__=="WINDOWS":
+            modapk_win.genapk(designated_name,seed)
+            return designated_name
         os.system("./modapk/modapk.sh OTP_PoC.apk 1.apk -w assets/OTP_seed.txt "+str(seed))
         os.replace("/modapk/1.apk", "designated_name")
         return designated_name
