@@ -47,19 +47,34 @@
 			let srcs = CryptoJS.enc.Utf8.parse(word);
 			let encrypted = CryptoJS.AES.encrypt(srcs, key, { iv: iv, mode: CryptoJS.mode.CBC, padding: CryptoJS.pad.Pkcs7 });
 			return encrypted.ciphertext.toString();
-    	}
+        }
+        
+        function DecryptJson(j){
+            for(var key in j){
+                if (key=='uuid')continue;
+                j[key] = Decrypt(j[key]);
+            }
+            return j;
+        }
 
+        function EncryptJson(j){
+            for(var key in j){
+                if (key=='uuid')continue;
+
+                j[key] = Encrypt(j[key]);
+            }
+            return j;
+        }
 		// For testing
 		var word = '123123';
 		en = Encrypt(word);
 		console.log("Encrypted", en);
 		de = Decrypt(en);
-		console.log("Decrypted", de);
+        console.log("Decrypted", de);
+        
 	</script>
 	<script>
         $(document).ready(
-
-
             function () {
 				 
                 let result = [];
@@ -72,6 +87,10 @@
                         result = msg['data'];
                     }
                 });
+                var tmp = {}
+                for(var i =0;i<result.length;i++){
+                    result[i]=DecryptJson(result[i])
+                }
 				console.log('result is', result);
                 var columnDefs = [{
                     data: "uuid",
@@ -122,8 +141,8 @@
                     }],
 					
                     onAddRow: function (datatable, rowdata, success, error) {
+                        rowdata = EncryptJson(rowdata);
                         rowdata['type'] = 'ADD';
-						rowdata = Encrypt(rowdata);
                         $.ajax({
                             // a tipycal url would be / with type='PUT'
                             url:"/updateKeyChain",
@@ -131,13 +150,13 @@
                             contentType: 'application/json; charset=UTF-8',
                             data: JSON.stringify(rowdata),
                             type: 'POST',
-                            success: success,
+                            success: function(){location.reload();},
                             error: error
                         });
                     },
                     onDeleteRow: function (datatable, rowdata, success, error) {
+						rowdata = EncryptJson(rowdata);
                         rowdata['type'] = 'DEL';
-						rowdata = Encrypt(rowdata);
                         $.ajax({
                             // a tipycal url would be / with type='PUT'
                             url:"/updateKeyChain",
@@ -145,13 +164,13 @@
                             datatype: "json",
                             contentType: 'application/json; charset=UTF-8',
                             data: JSON.stringify(rowdata),
-                            success: success,
+                            success: function(){location.reload();},
                             error: error
                         });
                     },
                     onEditRow: function (datatable, rowdata, success, error) {
+						rowdata = EncryptJson(rowdata);
                         rowdata['type'] = 'EDI';
-						rowdata = Encrypt(rowdata);
                         $.ajax({
                             // a tipycal url would be / with type='PUT'
                             url:"/updateKeyChain",
@@ -159,7 +178,7 @@
                             datatype: "json",
                             contentType: 'application/json; charset=UTF-8',
                             data: JSON.stringify(rowdata),
-                            success: success,
+                            success: function(){location.reload();},
                             error: error
                         });
                     }
