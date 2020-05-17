@@ -90,7 +90,7 @@
                                     <label for="dpassword">Password</label>
                                     <input id="dpassword" class="form-control" required name="dpassword" type="password"
                                         value="">
-                                    <p id="errorMsg" style="display: hidden; color: red;"></p>
+                                    <p id="derrorMsg" style="display: hidden; color: red;"></p>
                                     <button id="btnDelete" class="btn btn-danger"><b>DELETE</b></button>
                                     <span><b>this account.</b></span>
                                 </form>
@@ -227,6 +227,11 @@
                 mydata,
                 function (data, status) {
                     //unfinished
+                    if (data.status == "ERR") {
+                            $("#errorMsg").html(data.msg)
+                        } else {
+                            alert(data.msg)
+                        }
                 });
         });
 
@@ -243,6 +248,11 @@
                     mydata,
                     function (data, status) {
                         //unfinished
+                        if (data.status == "ERR") {
+                            $("#derrorMsg").html(data.msg)
+                        } else {
+                            window.location.href = "/view";
+                        }
                     });
             }
         })
