@@ -64,21 +64,19 @@
 		var key = CryptoJS.enc.Utf8.parse(""); 
     	var iv = CryptoJS.enc.Utf8.parse('ABCDEF1234123412');
 		function Decrypt(word) {
-            console.log("11")
 			let encryptedHexStr = CryptoJS.enc.Hex.parse(word);
-            console.log("12")
-
 			let srcs = CryptoJS.enc.Base64.stringify(encryptedHexStr);
-            console.log("13")
-
 			let decrypt = CryptoJS.AES.decrypt(srcs, key, { iv: iv, mode: CryptoJS.mode.CBC, padding: CryptoJS.pad.Pkcs7 });
-            console.log("14")
-
-			let decryptedStr = decrypt.toString(CryptoJS.enc.Utf8);
-            console.log("15")
-
-			return decryptedStr.toString();
+			try{
+                let decryptedStr = decrypt.toString(CryptoJS.enc.Utf8);
+			    return decryptedStr.toString();
+            }
+            catch(err){
+                console.log(err);
+                return "".toString();
+            }
     	}
+
 
 		function Encrypt(word) {
 			let srcs = CryptoJS.enc.Utf8.parse(word);
@@ -89,7 +87,8 @@
         function changeKey() {
 			let keyvalue = document.getElementById("spwd").value;
             sessionStorage.setItem('key', keyvalue);
-			key = CryptoJS.enc.Utf8.parse(keyvalue);
+
+			key = CryptoJS.enc.Utf8.parse(keyvalue.padEnd(32,"0").slice(0,32));
             $('#spwd').attr("readonly",true);
             $("#changeKey").hide();
             load_data();
@@ -237,17 +236,9 @@
                     $("#changeKey").show();
                     $('#spwd').attr("readonly",false);
                 }else{
-                    console.log("1");
-                    
                     document.getElementById("spwd").value = key_data;
-                    console.log("2");
-
-                    key = CryptoJS.enc.Utf8.parse(key_data);
-                    console.log("3");
-
+                    key = CryptoJS.enc.Utf8.parse(keyvalue.padEnd(32,"0").slice(0,32));
                     load_data();
-                    console.log("4");
-                    
                 }
 
             }
