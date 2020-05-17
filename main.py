@@ -158,7 +158,7 @@ def register():
 
 @login_required
 @app.route('/accountUpdate',methods=['POST','GET'])
-def register():
+def accountUpdate():
     form = RegisterForm()
     if form.validate_on_submit():
         op_type = request.form.get('type', None)

@@ -37,9 +37,9 @@
     <div class="container">
 		<div id="table-wrapper" class="dataTables_wrapper no-footer">
 			
-			<button class="dt-button" onclick="changeKey()">Set Secondary Password</button>
+			<button id="changeKey" class="dt-button" onclick="changeKey()">Set Secondary Password</button>
 			<div class="dataTables_filter">
-				<label>Secondary Password (1234 by default): <input type="search" id="spwd" value="1234" class placeholder></label>
+				<label>Secondary Password: <input type="search" id="spwd" value="" class placeholder></label>
 			</div>
 			
 		</div>
@@ -61,13 +61,22 @@
     <script rel="stylesheet" src="{{ url_for('static',filename='js/dataTables.altEditor.free.js') }}"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>
 	<script>
-		var key = CryptoJS.enc.Utf8.parse("1234"); 
+		var key = CryptoJS.enc.Utf8.parse(""); 
     	var iv = CryptoJS.enc.Utf8.parse('ABCDEF1234123412');
 		function Decrypt(word) {
+            console.log("11")
 			let encryptedHexStr = CryptoJS.enc.Hex.parse(word);
+            console.log("12")
+
 			let srcs = CryptoJS.enc.Base64.stringify(encryptedHexStr);
+            console.log("13")
+
 			let decrypt = CryptoJS.AES.decrypt(srcs, key, { iv: iv, mode: CryptoJS.mode.CBC, padding: CryptoJS.pad.Pkcs7 });
+            console.log("14")
+
 			let decryptedStr = decrypt.toString(CryptoJS.enc.Utf8);
+            console.log("15")
+
 			return decryptedStr.toString();
     	}
 
@@ -76,38 +85,37 @@
 			let encrypted = CryptoJS.AES.encrypt(srcs, key, { iv: iv, mode: CryptoJS.mode.CBC, padding: CryptoJS.pad.Pkcs7 });
 			return encrypted.ciphertext.toString();
         }
+
         function changeKey() {
 			let keyvalue = document.getElementById("spwd").value;
-			var key = CryptoJS.enc.Utf8.parse(keyvalue);
-			console.log("keyvalue is: ",keyvalue);
-			var test = "test";
-			var en = Encrypt(test);
-			console.log("Test encrypted: ", en);
-			var de = Decrypt(en);
-			console.log("Test decrypted: ", de);
+            sessionStorage.setItem('key', keyvalue);
+			key = CryptoJS.enc.Utf8.parse(keyvalue);
+            $('#spwd').attr("readonly",true);
+            $("#changeKey").hide();
+            load_data();
 		}
+
         function DecryptJson(j){
+            console.log("start")
             for(var key in j){
                 if (key=='uuid')continue;
                 j[key] = Decrypt(j[key]);
             }
+            console.log("end")
             return j;
         }
 
         function EncryptJson(j){
+
             for(var key in j){
                 if (key=='uuid')continue;
 
                 j[key] = Encrypt(j[key]);
             }
+
             return j;
         }
-        
-	</script>
-	<script>
-        $(document).ready(
-            function () {
-				 
+        function load_data() {
                 let result = [];
                 $.ajax({
                     type: "post",
@@ -216,7 +224,34 @@
                     
                 });
 
-            });
+            }
+
+        $(document).ready(
+            //sessionStorage.setItem('key', 'have a test');
+            function (){
+                var key_data = sessionStorage.getItem('key');
+                $("#changeKey").hide();
+                $('#spwd').attr("readonly",false)
+                if (key_data==null || key_data==""){
+                    alert("Please enter a secondary password first");
+                    $("#changeKey").show();
+                    $('#spwd').attr("readonly",false);
+                }else{
+                    console.log("1");
+                    
+                    document.getElementById("spwd").value = key_data;
+                    console.log("2");
+
+                    key = CryptoJS.enc.Utf8.parse(key_data);
+                    console.log("3");
+
+                    load_data();
+                    console.log("4");
+                    
+                }
+
+            }
+        );
     </script>
 </body>
 
