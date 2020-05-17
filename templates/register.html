@@ -114,8 +114,8 @@
     <script src="{{ url_for('static', filename = 'styles/bootstrap-js/bootstrap.min.js')}}"></script>
     <script>
         $(document).ready(function () {
-            var isPasswordValid = true;
-            var isRepasswordValid = true;
+            var isPasswordValid = false;
+            var isRepasswordValid = false;
             // move on the password and show.
             $("#password").focus(function () {
                 if (!isPasswordValid) {
