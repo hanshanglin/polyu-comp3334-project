@@ -90,7 +90,6 @@ class User(UserMixin):
     def verify_password(self, password, dynamic):
         if self.password_hash is None or self.seed is None:
             return False
-        
         if self.try_time>=5 and time.time() - 600 < self.last_login_time:
             return 2
         if check_password_hash(self.password_hash, password):
@@ -109,7 +108,7 @@ class User(UserMixin):
 
     def check_dynamic(self,dynamic):
         # (unixtime%1000 /30)^2 *seed_token %1000000
-        if self.seed is None:
+        if self.seed is None or not str(dynamic).isnumeric():
             return False
         return OTPPreset.check(self.seed, dynamic)
 

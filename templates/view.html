@@ -88,7 +88,7 @@
 			let keyvalue = document.getElementById("spwd").value;
             sessionStorage.setItem('key', keyvalue);
 
-			key = CryptoJS.enc.Utf8.parse(keyvalue.padEnd(32,"0").slice(0,32));
+			key = CryptoJS.enc.Utf8.parse(keyvalue.padEnd(32,"@").slice(0,32));
             $('#spwd').attr("readonly",true);
             $("#changeKey").hide();
             load_data();
@@ -237,7 +237,7 @@
                     $('#spwd').attr("readonly",false);
                 }else{
                     document.getElementById("spwd").value = key_data;
-                    key = CryptoJS.enc.Utf8.parse(keyvalue.padEnd(32,"0").slice(0,32));
+                    key = CryptoJS.enc.Utf8.parse(key_data.padEnd(32,"@").slice(0,32));
                     load_data();
                 }
 
