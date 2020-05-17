@@ -156,6 +156,34 @@ def register():
         return jsonify({'status':'OK','win':url_for("OTP_download",filename=user_name+".py"),'android':url_for('OTP_download',filename=user_name+'.apk')})
     return render_template('register.html',form = form,User = current_user.is_authenticated)
 
+@login_required
+@app.route('/accountUpdate',methods=['POST','GET'])
+def register():
+    form = RegisterForm()
+    if form.validate_on_submit():
+        op_type = request.form.get('type', None)
+        if op_type == 'modify':
+            # change password
+            opwd = request.form.get('opassword', None)
+            npwd = request.form.get('password', None)
+            if state == current_user._get_current_object().change_pwd(opwd,npwd):
+            # success
+                return jsonify({'status':'OK','msg':'change password successfully'})
+            else:
+                return jsonify({'status':'ERR','msg':'password is not match'})
+        elif op_type == 'delete':
+            # delete account
+            npwd = request.form.get('password', None)
+            if current_user._get_current_object().delete_account(npwd):
+                logout_user()
+                return jsonify({'status':'OK','msg':'delete account successfully'})
+            else:
+                return jsonify({'status':'ERR','msg':'password is not match'})
+        else:
+            # ERR
+            return jsonify({'status':'ERR','msg':'Unknown operation'})
+    return jsonify({'status':'ERR','msg':'Unknown Error, please refresh the page and try again.'})
+
 
 @app.route('/logout')
 @login_required

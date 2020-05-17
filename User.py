@@ -39,6 +39,42 @@ class User(UserMixin):
             profiles[self.username] = [self.password_hash,self.id,self.seed,self.keychain,0,time.time()]
             f.write(json.dumps(profiles))
 
+    def change_pwd(self, opwd,npwd):
+        if check_password_hash(self.password_hash, opwd):
+            # change
+            with open(PROFILES) as f:
+                try:
+                    profiles = json.load(f)
+                except ValueError:
+                    return False
+            self.password_hash = generate_password_hash(npwd,salt_length=16)
+            with open(PROFILES,'w') as f:
+                profiles[self.username][0] = self.password_hash
+                profiles[self.username][4] = 0
+                profiles[self.username][5] = time.time()
+                f.write(json.dumps(profiles))
+            return True
+        else:
+            return False
+    
+    def delete_account(self, pwd):
+        if check_password_hash(self.password_hash, opwd):
+            # del 
+            with open(PROFILES) as f:
+                try:
+                    profiles = json.load(f)
+                except ValueError:
+                    return False
+            self.password_hash = "DELETE"
+            with open(PROFILES,'w') as f:
+                profiles[self.username][0] = self.password_hash
+                profiles[self.username][4] = 0
+                profiles[self.username][5] = time.time()
+                f.write(json.dumps(profiles))
+            return True
+        else:
+            return False
+
     def dynamic_seed(self):
         """save dynamic seed to json file
         

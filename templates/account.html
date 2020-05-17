@@ -232,7 +232,7 @@
             opassword = sha256(opassword);
             var mydata = { 'csrf_token': csrf_token, 'opassword': opassword, 'password': password, 'type': "modify" };
             $.post(
-                "/confirm", //unfinished
+                "/accountUpdate", //unfinished
                 mydata,
                 function (data, status) {
                     //unfinished
@@ -248,7 +248,7 @@
                 password = sha256(password);
                 var mydata = { 'csrf_token': csrf_token, 'password': password, 'type': "delete" };
                 $.post(
-                    "/delete", //unfinished
+                    "/accountUpdate", //unfinished
                     mydata,
                     function (data, status) {
                         //unfinished
