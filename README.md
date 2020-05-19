@@ -1,11 +1,10 @@
 # security-project
 
-google doc https://docs.google.com/document/d/1N0tYaY7E8IxfrW0oHHAEML5UdhBxL80FoJVeQe-TVF0/edit?usp=sharing
-
-
 platform: flask+JS
 
 ## 运行：
+    安装任意版本JDK
+    
     使用pip
         pip install -r requirements.txt
         python main.py
